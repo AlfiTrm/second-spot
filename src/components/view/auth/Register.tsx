@@ -14,8 +14,7 @@ type UserProps = {
 
 const Register = (props: UserProps) => {
   const [showPassword, setShowPassword] = useState<boolean>(false);
-  const [showConfirmPassword, setShowConfirmPassword] =
-    useState<boolean>(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState<boolean>(false);
   const [user, setUser] = useState<UserProps>({} as UserProps);
   const navigate = useNavigate();
 
