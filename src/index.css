@@ -1,4 +1,8 @@
-/* installfont */
-
-
 @import "tailwindcss";
+
+@theme {
+    --color-primary: #3674B5;
+    --color-secondary: #A1E3F9;
+    --color-accent: #D1F8EF;
+    --font-primary:"Inter", sans-serif;
+}
