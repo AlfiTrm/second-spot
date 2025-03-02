@@ -1,8 +1,8 @@
 import Carousel from "../../partial/Carousel";
 import ProductCards from "../../partial/ProductCards";
 import { IoIosArrowBack, IoIosArrowForward } from "react-icons/io";
-import { dummySlides } from "../../data/DummySlides";
-import search from "../../../assets/home/search.webp";
+import { dummySlides } from "../../../data/DummySlides";
+import searchIcon from "../../../assets/home/search.webp";
 import bola from "../../../assets/home/bola.webp";
 import baju from "../../../assets/home/baju.webp";
 import buku from "../../../assets/home/buku.webp";
@@ -26,6 +26,9 @@ export interface IProduct {
 
 const Home = () => {
   const [product, setProduct] = useState<IProduct[]>([]);
+  const [categoryFilter, setCategoryFilter] = useState<string>('semua')
+  const [search, setSearch] = useState<string>('')
+  const [sortOrder, setSortOrder] = useState<string>('')
 
   const getProducts = async () => {
     try {
@@ -38,13 +41,19 @@ const Home = () => {
     }
   };
 
+  const filteredProducts = product
+  .filter(product => (
+    categoryFilter === "semua" || product.category === categoryFilter
+  ) && product.title.toLowerCase().includes(search.toLowerCase()))
+  .sort((a,b) => sortOrder === 'asc' ? a.price - b.price : b.price - a.price)
+
   useEffect(() => {
     getProducts();
   }, []);
 
   return (
-    <div className="bg-[#F4F4F4]">
-      <section className="">
+    <div className="bg-main">
+      <section >
         <Carousel slides={dummySlides} />
       </section>
 
@@ -52,13 +61,15 @@ const Home = () => {
         <form action="" className="relative w-96">
           <input
             type="search"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
             name=""
             id=""
             placeholder="Cari Apa?"
             className="w-96 h-12 px-12 border border-gray-100 shadow bg-white shadow-gray-200 rounded-full"
           />
 
-          <img src={search} alt="" className="absolute top-3 left-3 w-7 h-7" />
+          <img src={searchIcon} alt="" className="absolute top-3 left-3 w-7 h-7" />
         </form>
       </section>
 
@@ -76,9 +87,9 @@ const Home = () => {
 
       <section className=" flex justify-center items-center mt-10">
         <div className="grid grid-cols-2 lg:grid-cols-5 md:grid-cols-3 gap-10">
-          {product.map((product, index) => (
+          {filteredProducts.map((product) => (
             <ProductCards
-              key={index}
+              id={product.id}
               image={product.image}
               title={product.title}
               price={product.price}
