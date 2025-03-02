@@ -89,10 +89,7 @@ const Home = () => {
         <div className="grid grid-cols-2 lg:grid-cols-5 md:grid-cols-3 gap-10">
           {filteredProducts.map((product) => (
             <ProductCards
-              id={product.id}
-              image={product.image}
-              title={product.title}
-              price={product.price}
+              {...product}
             />
           ))}
         </div>
