@@ -1,5 +1,6 @@
-import React, { ReactNode } from 'react'
+import { ReactNode } from 'react'
 import Navbar from '../components/partial/Navbar'
+
 
 type Props = {
   children: ReactNode
