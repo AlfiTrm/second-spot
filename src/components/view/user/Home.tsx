@@ -26,9 +26,9 @@ export interface IProduct {
 
 const Home = () => {
   const [product, setProduct] = useState<IProduct[]>([]);
-  const [categoryFilter, setCategoryFilter] = useState<string>('semua')
+  // const [categoryFilter, setCategoryFilter] = useState<string>('semua')
   const [search, setSearch] = useState<string>('')
-  const [sortOrder, setSortOrder] = useState<string>('')
+  // const [sortOrder, setSortOrder] = useState<string>('')
 
   const getProducts = async () => {
     try {
@@ -42,10 +42,10 @@ const Home = () => {
   };
 
   const filteredProducts = product
-  .filter(product => (
-    categoryFilter === "semua" || product.category === categoryFilter
-  ) && product.title.toLowerCase().includes(search.toLowerCase()))
-  .sort((a,b) => sortOrder === 'asc' ? a.price - b.price : b.price - a.price)
+  // .filter(product => (
+  //   categoryFilter === "semua" || product.category === categoryFilter
+  // ) && product.title.toLowerCase().includes(search.toLowerCase()))
+  // .sort((a,b) => sortOrder === 'asc' ? a.price - b.price : b.price - a.price)
 
   useEffect(() => {
     getProducts();
