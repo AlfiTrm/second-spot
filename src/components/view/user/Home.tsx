@@ -1,17 +1,7 @@
-import Carousel from "../../partial/Carousel";
-import ProductCards from "../../partial/ProductCards";
-import { IoIosArrowBack, IoIosArrowForward } from "react-icons/io";
-import { dummySlides } from "../../../data/DummySlides";
-import searchIcon from "../../../assets/home/search.webp";
-import bola from "../../../assets/home/bola.webp";
-import baju from "../../../assets/home/baju.webp";
-import buku from "../../../assets/home/buku.webp";
-import hp from "../../../assets/home/hp.webp";
-import motor from "../../../assets/home/motor.webp";
-import kursi from "../../../assets/home/kursi.webp";
-import Category from "../../partial/Category";
-import ticket from "../../../assets/home/ticket.webp";
-import { useEffect, useState } from "react";
+import Carousel from "../../partial/home/Carousel";
+import ProductCards from "../../partial/home/ProductCards";
+import { FiSearch } from "react-icons/fi";
+import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { END_API } from "../../../api/api";
 
@@ -24,11 +14,11 @@ export interface IProduct {
   image: string;
 }
 
-const Home = () => {
+const Home: React.FC = () => {
   const [product, setProduct] = useState<IProduct[]>([]);
-  // const [categoryFilter, setCategoryFilter] = useState<string>('semua')
-  const [search, setSearch] = useState<string>('')
-  // const [sortOrder, setSortOrder] = useState<string>('')
+  const [categoryFilter, ] = useState<string>("semua");
+  const [search, setSearch] = useState<string>("");
+  const [sortOrder, ] = useState<string>("");
 
   const getProducts = async () => {
     try {
@@ -42,65 +32,88 @@ const Home = () => {
   };
 
   const filteredProducts = product
-  // .filter(product => (
-  //   categoryFilter === "semua" || product.category === categoryFilter
-  // ) && product.title.toLowerCase().includes(search.toLowerCase()))
-  // .sort((a,b) => sortOrder === 'asc' ? a.price - b.price : b.price - a.price)
+    .filter(
+      (product) =>
+        (categoryFilter === "semua" || product.category === categoryFilter) &&
+        product.title.toLowerCase().includes(search.toLowerCase())
+    )
+    .sort((a, b) =>
+      sortOrder === "asc" ? a.price - b.price : b.price - a.price
+    );
 
   useEffect(() => {
     getProducts();
   }, []);
 
   return (
-    <div className="bg-main">
-      <section >
-        <Carousel slides={dummySlides} />
-      </section>
+    <div className="pt-30">
+      <section>{search === "" && <Carousel />}</section>
 
-      <section className="flex justify-center items-center mt-20">
-        <form action="" className="relative w-96">
+      <section className="mt-10 flex gap-5 justify-center items-center">
+        <form action="" className="relative">
           <input
             type="search"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             name=""
             id=""
-            placeholder="Cari Apa?"
-            className="w-96 h-12 px-12 border border-gray-100 shadow bg-white shadow-gray-200 rounded-full"
+            placeholder="Cari Produk"
+            className="w-195 h-12 px-5 border border-gray-300 bg-white shadow-gray-200 rounded-full"
           />
+          <button className="cursor-pointer">
+            <div className="w-20 h-8 bg-primary absolute top-2 right-5 rounded-full"></div>
+            <FiSearch className="absolute text-white w-4 h-4 top-4 right-13" />
+          </button>
+        </form>
 
-          <img src={searchIcon} alt="" className="absolute top-3 left-3 w-7 h-7" />
+        <form className="w-95 h-12">
+          <select className="w-full h-full px-2.5 border bg-white border-gray-300 rounded-full">
+            <option selected>Pilih lokasi</option>
+            <option value="1">Sukun</option>
+            <option value="2">Dau</option>
+            <option value="3">Ngawi</option>
+          </select>
         </form>
       </section>
 
-      <section className="flex justify-center items-center mt-10">
-        <div className="grid grid-cols-7 gap-5 md:gap-10">
-          <Category imageSrc={buku} text="Buku & Alat tulis" />
-          <Category imageSrc={hp} text="Elektronik & Gadget" />
-          <Category imageSrc={motor} text="Kendaraan" />
-          <Category imageSrc={kursi} text="Peralatan Kos" />
-          <Category imageSrc={baju} text="Fashion & Aksesoris" />
-          <Category imageSrc={bola} text="Olahraga & Hobi" />
-          <Category imageSrc={ticket} text="Tiket & Voucher" />
-        </div>
+      <section className="flex mt-10 justify-center text-white gap-5">
+        <form className="w-45 h-10">
+          <select className="w-full h-full px-2.5 border bg-primary border-gray-300 rounded-full">
+            <option selected>Kategori</option>
+            <option value="1">Sukun</option>
+            <option value="2">Dau</option>
+            <option value="3">Ngawi</option>
+          </select>
+        </form>
+        <form className="w-45 h-10">
+          <select className="w-full h-full px-2.5 border bg-primary border-gray-300 rounded-full">
+            <option selected>Kondisi</option>
+            <option value="1">Sukun</option>
+            <option value="2">Dau</option>
+            <option value="3">Ngawi</option>
+          </select>
+        </form>
+        <form className="w-45 h-10">
+          <select className="w-full h-full px-2.5 border bg-primary border-gray-300 rounded-full">
+            <option selected>Harga</option>
+            <option value="1">Sukun</option>
+            <option value="2">Dau</option>
+          </select>
+        </form>
       </section>
 
-      <section className=" flex justify-center items-center mt-10">
-        <div className="grid grid-cols-2 lg:grid-cols-5 md:grid-cols-3 gap-10">
+      <section className=" bg-main pt-8 px-16 2xl:px-32 flex justify-center items-center mt-10">
+        <div className="grid grid-cols-2 lg:grid-cols-4 md:grid-cols-3 gap-5 ">
           {filteredProducts.map((product) => (
-            <ProductCards
-              {...product}
-            />
+            <ProductCards {...product} />
           ))}
         </div>
       </section>
 
-      <section className="flex justify-center items-center mt-10 space-x-10">
-        <IoIosArrowBack className="w-5 h-10" />
-        <div className="w-10 h-10 flex items-center justify-center rounded-full bg-white shadow shadow-black">
-          1
-        </div>
-        <IoIosArrowForward className="w-5 h-10" />
+      <section className="flex justify-center items-center pt-10 pb-10 bg-main">
+        <button className="bg-primary text-white font-semibold text-base w-45 h-10 rounded-full cursor-pointer hover:bg-sky-700">
+          Lihat lebih banyak
+        </button>
       </section>
     </div>
   );
