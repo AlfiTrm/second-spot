@@ -1,20 +1,14 @@
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
-
-//import layout
-import MainLayout from "./layout/MainLayout";
-
-// import user
 import Home from "./components/view/user/Home";
+import MainLayout from "./layout/MainLayout";
+import Login from "./components/view/auth/Login";
 import Detail from "./components/view/user/Detail";
 import Chat from "./components/view/user/Chat";
+import Register from "./components/view/auth/Register";
 import Favorite from "./components/view/user/Favorite";
 import Profile from "./components/view/user/Profile";
 import ChangeProfile from "./components/view/user/ChangeProfile";
 import Sell from "./components/view/user/Sell";
-
-// import auth
-import Register from "./components/view/auth/Register";
-import Login from "./components/view/auth/Login";
 
 const router = createBrowserRouter([
   {
