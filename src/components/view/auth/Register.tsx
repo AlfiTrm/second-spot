@@ -2,93 +2,98 @@ import { Link, useNavigate } from "react-router-dom";
 import { FormEvent, useState } from "react";
 import { BiHide, BiShowAlt } from "react-icons/bi";
 import axios from "axios";
-import vektor from "../../../assets/auth/vektor1.webp";
-import { END_API } from "../../../api/api";
+import { END_AUTH } from "../../../api/api";
 
 type UserProps = {
   id: number;
   username: string;
   email: string;
   password: string;
+  confirm_password: string;
 };
 
-const Register = (props: UserProps) => {
+const Register = () => {
   const [showPassword, setShowPassword] = useState<boolean>(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState<boolean>(false);
+  const [showConfirmPassword, setShowConfirmPassword] =
+    useState<boolean>(false);
   const [user, setUser] = useState<UserProps>({} as UserProps);
   const navigate = useNavigate();
 
   const handleRegister = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    const user = {
-      username: props.username,
-      email: props.email,
-      password: props.password,
+    const userData = {
+      email: user.email,
+      username: user.username,
+      password: user.password,
+      confirm_password: user.confirm_password,
     };
 
     try {
-      const response = await axios.post(`${END_API.BASE_URL}/users`, user);
+      const response = await axios.post(`${END_AUTH.REGISTER}`, userData);
       const data = await response.data;
       console.log(data);
       setUser(data);
       navigate("/Login");
     } catch (error) {
-      console.error(error);
+      console.error("as", error);
     }
   };
 
   return (
     <div>
-      <div className="font-primary w-full h-[100vh] from-primary to-secondary bg-linear-0">
-        <div className="flex md:px-32 justify-center md:justify-between items-center h-full">
-          <img
-            src={vektor}
-            alt="gambar candi"
-            className="absolute w-xs md:w-sm h-10/12 md:h-full bottom-0 left-0 "
-          />
-          <section className="text-white w-5/12 lg:w-6/12 md:flex hidden md:visible flex-col gap-10">
+      <div className="font-primary w-full h-lvh bg-white">
+        <div className="flex lg:justify-between justify-center items-center h-full lg:px-52 2xl:px-56">
+          
+          <section className="text-primary border min-w-4/12 md:w-6/12 lg:w-6/12 lg:flex hidden md:visible flex-col gap-10">
             <div className="flex justify-center">ini logo</div>
-            <p>
-              Second Spot adalah platform jual beli barang bekas yang dirancang
+            {/* <p>
+              Second Spot adalah platform jual beli barang bekas yang dirancang
               khusus untuk mahasiswa dan masyarakat di Malang. Dengan fokus pada
               kemudahan, keamanan, dan transparansi transaksi, Second Spot
               menjadi solusi bagi mereka yang ingin menjual atau membeli barang
               bekas dengan lebih nyaman dan terpercaya.
-            </p>
+            </p> */}
           </section>
 
-          <section className="w-6/12 xs:w-5/12 md:w-4/12  h-8/12  bg-white rounded-xl shadow-2xl shadow-gray-500">
-            <div className="px-8 pt-14  md:pt-16 flex flex-col md:gap-5 gap-10">
-              <div className="font-bold text-primary text-3xl">
+          <section className="w-110 h-150 lg:w-120 2xl:h-150 bg-white rounded-xl shadow-2xl shadow-gray-500">
+            <div className="px-8 pt-17 flex flex-col gap-8">
+              <div className="font-semibold text-primary lg:text-3xl 2xl:text-4xl">
                 <h2>Daftar</h2>
               </div>
               <form onSubmit={handleRegister} key={user.id}>
-                <div className="w-full flex flex-col gap-10">
-                  <input
-                    value={user.username}
-                    type="text"
-                    placeholder="nama user"
-                    onChange={() => {}}
-                    required
-                    className="shadow shadow-primary/50 w-full h-11 px-3 rounded-full"
-                  />
+                <div className="w-full flex flex-col gap-8">
                   <input
                     value={user.email}
                     type="email"
                     placeholder="email"
+                    onChange={(e) =>
+                      setUser({ ...user, email: e.target.value })
+                    }
                     required
-                    className="shadow shadow-primary/50 w-full h-11 p-2 rounded-full"
+                    className="shadow shadow-primary/50 w-full h-10 px-3 rounded-full"
+                  />
+                  <input
+                    value={user.username}
+                    type="text"
+                    placeholder="username"
+                    onChange={(e) =>
+                      setUser({ ...user, username: e.target.value })
+                    }
+                    required
+                    className="shadow shadow-primary/50 w-full h-10 p-2 rounded-full"
                   />
                   <div className="relative">
                     <input
                       value={user.password}
                       type={showPassword ? "text" : "password"}
                       placeholder="password"
+                      onChange={(e) =>
+                        setUser({ ...user, password: e.target.value })
+                      }
                       required
-                      className="shadow shadow-primary/50 w-full h-11 p-2 rounded-full"
+                      className="shadow shadow-primary/50 w-full h-10 p-2 rounded-full"
                     />
-
                     <button
                       type="button"
                       onClick={() => setShowPassword(!showPassword)}
@@ -104,12 +109,15 @@ const Register = (props: UserProps) => {
 
                   <div className="relative">
                     <input
+                      value={user.confirm_password}
                       type={showConfirmPassword ? "text" : "password"}
                       placeholder="konfirmasi password"
+                      onChange={(e) =>
+                        setUser({ ...user, confirm_password: e.target.value })
+                      }
                       required
-                      className="shadow shadow-primary/50 w-full h-11 p-2 rounded-full"
+                      className="shadow shadow-primary/50 w-full h-10 p-2 rounded-full"
                     />
-
                     <button
                       type="button"
                       onClick={() =>
@@ -125,14 +133,14 @@ const Register = (props: UserProps) => {
                     </button>
                   </div>
 
-                  <div className="flex flex-col items-center gap-5">
+                  <div className="flex flex-col items-center gap-8">
                     <button
                       type="submit"
-                      className="flex justify-center cursor-pointer bg-primary text-white font-semibold items-center w-1/2 h-11 shadow shadow-gray-500 rounded-full hover:bg-sky-600"
+                      className="flex justify-center cursor-pointer bg-primary text-white font-semibold items-center w-1/2 h-10 shadow shadow-gray-500 rounded-full hover:bg-sky-600"
                     >
                       <h3>DAFTAR</h3>
                     </button>
-                    <p className="">
+                    <p>
                       Sudah punya akun?
                       <span className="text-primary cursor-pointer">
                         <Link to={"/Login"}> Masuk</Link>
