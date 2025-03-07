@@ -1,31 +1,26 @@
 import { Link } from "react-router-dom";
-import vektor from "../../../assets/auth/vektor1.webp";
 import { FormEvent, useState } from "react";
 import { BiHide, BiShowAlt } from "react-icons/bi";
-import { END_API } from "../../../api/api";
+import { END_AUTH } from "../../../api/api";
 import axios from "axios";
 
 type LoginProps = {
-  id: number;
-  username: string;
+  identifier: string;
   password: string;
 };
 
-const Login = (props: LoginProps) => {
+const Login = () => {
   const [showPassword, setShowPassword] = useState<boolean>(false);
   const [user, setUser] = useState<LoginProps>({} as LoginProps);
 
   const handleLogin = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const credentials = {
-      username: props.username,
-      password: props.password,
+      identifier: user.identifier,
+      password: user.password,
     };
     try {
-      const response = await axios.post(
-        `${END_API.BASE_URL}/auth/login`,
-        credentials
-      );
+      const response = await axios.post(`${END_AUTH.LOGIN}`, credentials);
       const data = await response.data;
       console.log(data);
     } catch (error) {
@@ -35,40 +30,35 @@ const Login = (props: LoginProps) => {
 
   return (
     <div>
-      <div className="font-primary w-full h-[100vh] from-primary to-secondary bg-linear-0">
-        <section className="flex md:px-32 justify-center md:justify-between items-center h-full">
-          <img
-            src={vektor}
-            alt="gambar candi"
-            className="absolute w-md h-full bottom-0 left-0 "
-          />
-          <div className="text-white w-5/12 lg:w-6/12 md:flex hidden md:visible flex-col gap-10">
+      <div className="font-primary w-full h-lvh bg-white">
+        <div className="flex lg:justify-between justify-center items-center h-full lg:px-52 2xl:px-56">
+          <section className="text-primary border min-w-4/12 md:w-6/12 lg:w-6/12 lg:flex hidden md:visible flex-col gap-10">
             <div className="flex justify-center">ini logo</div>
-            <p>
+            {/* <p>
               Second Spot adalah platform jual beli barang bekas yang dirancang
               khusus untuk mahasiswa dan masyarakat di Malang. Dengan fokus pada
               kemudahan, keamanan, dan transparansi transaksi, Second Spot
               menjadi solusi bagi mereka yang ingin menjual atau membeli barang
               bekas dengan lebih nyaman dan terpercaya.
-            </p>
-          </div>
+            </p> */}
+          </section>
 
-          <section className="w-6/12 xs:w-5/12 md:w-4/12  h-6/12 bg-white rounded-xl shadow-2xl shadow-gray-500">
-            <div className="px-8 pt-20 flex flex-col gap-10">
-              <div className="font-bold text-primary text-3xl">
+          <section className="w-110 h-150 lg:w-120 2xl:h-150 bg-white rounded-xl shadow-2xl shadow-gray-500">
+            <div className="px-8 pt-35 flex flex-col gap-8">
+              <div className="font-semibold text-primary lg:text-3xl 2xl:text-4xl">
                 <h2>Masuk</h2>
               </div>
-              <form onSubmit={handleLogin} key={props.id}>
-                <div className="w-full flex flex-col gap-5">
+              <form onSubmit={handleLogin}>
+                <div className="w-full flex flex-col gap-8">
                   <input
-                    value={user.username}
+                    value={user.identifier}
                     onChange={(e) =>
-                      setUser({ ...user, username: e.target.value })
+                      setUser({ ...user, identifier: e.target.value })
                     }
-                    type="text"
-                    placeholder="nama user"
+                    type="email"
+                    placeholder="email"
                     required
-                    className="shadow shadow-primary/50  w-full h-11 px-3 rounded-full"
+                    className="shadow shadow-primary/50  w-full h-10 px-3 rounded-full"
                   />
                   <div className="relative">
                     <input
@@ -80,7 +70,7 @@ const Login = (props: LoginProps) => {
                       type={showPassword ? "text" : "password"}
                       placeholder="password"
                       required
-                      className="shadow shadow-primary/50 w-full h-11 p-2 rounded-full"
+                      className="shadow shadow-primary/50 w-full h-10 px-3 rounded-full"
                     />
                     <button
                       type="button"
@@ -94,27 +84,25 @@ const Login = (props: LoginProps) => {
                       )}
                     </button>
                   </div>
-                  <div className="flex flex-col items-center">
+                  <div className="flex flex-col items-center gap-8">
                     <button
                       type="submit"
                       className="flex justify-center cursor-pointer bg-primary text-white font-semibold items-center w-1/2 h-11 shadow shadow-gray-500 rounded-full"
                     >
                       <h3>MASUK</h3>
                     </button>
+                    <p>
+                      Sudah punya akun?
+                      <span className="text-primary cursor-pointer">
+                        <Link to={"/Register"}> Daftar</Link>
+                      </span>
+                    </p>
                   </div>
                 </div>
               </form>
-              <div className="flex justify-center -mt-6 ">
-                <p>
-                  Sudah punya akun?
-                  <span className="text-primary cursor-pointer">
-                    <Link to={"/Register"}> Daftar</Link>
-                  </span>
-                </p>
-              </div>
             </div>
           </section>
-        </section>
+        </div>
       </div>
     </div>
   );
