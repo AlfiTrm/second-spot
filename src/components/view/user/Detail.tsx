@@ -4,10 +4,10 @@ import { useParams } from "react-router-dom";
 import { END_API } from "../../../api/api";
 import { IProduct } from "./Home";
 import lokasi from "../../../assets/detail/location.webp";
-import condition from "../../../assets/detail/condition.webp";
-import payment from "../../../assets/detail/payment.webp";
-import whatsApp from "../../../assets/detail/ic_baseline-whatsapp.webp"
-import wCart from "../../../assets/detail/white-baket.webp"
+import box from "../../../assets/detail/box.webp";
+import payment from "../../../assets/detail/handShake.webp";
+import { FiSearch } from "react-icons/fi";
+import { LuHeart } from "react-icons/lu";
 
 const Detail = ({}: IProduct) => {
   const { id } = useParams();
@@ -28,41 +28,119 @@ const Detail = ({}: IProduct) => {
   }, [id]);
 
   return (
-    <div className="bg-main">
-      <div className="flex justify-center h-[100vh]">
-        <div className="w-10/12 h-8/12 mt-34 px-5 py-10 bg-white shadow rounded-xl">
-          <div className="flex justify-start">
-            <section className="flex-flex-col">
+    <header className="bg-main pb-40">
+      <main className="flex flex-col items-center h-lvh ">
+        <section className="mt-30 flex gap-5 justify-center items-center ">
+          <form action="" className="relative">
+            <input
+              type="search"
+              name=""
+              id=""
+              placeholder="Cari Produk"
+              className="w-195 h-12 px-5 border border-gray-300 bg-white shadow-gray-200 rounded-full"
+            />
+            <button className="cursor-pointer">
+              <div className="w-20 h-8 bg-primary absolute top-2 right-5 rounded-full"></div>
+              <FiSearch className="absolute text-white w-4 h-4 top-4 right-13" />
+            </button>
+          </form>
+
+          <form className="w-95 h-12">
+            <select className="w-full h-full px-2.5 border bg-white border-gray-300 rounded-full">
+              <option selected>Pilih lokasi</option>
+              <option value="1">Sukun</option>
+              <option value="2">Dau</option>
+              <option value="3">Ngawi</option>
+            </select>
+          </form>
+        </section>
+
+        <section className="w-295 h-213 mt-10 px-5">
+          <article className="flex">
+            <figure className="flex flex-col">
               <img
                 src={productDetail.image}
                 alt=""
-                className="w-lg h-96 rounded-xl shadow object-contain"
+                className="w-145 h-145 rounded-2xl shadow object-cover"
               />
-            </section>
+              <div className="mt-15 flex gap-2">
+                <img
+                  src={productDetail.image}
+                  alt=""
+                  className="w-25 h-25 rounded-2xl shadow object-cover"
+                />
+                <img
+                  src={productDetail.image}
+                  alt=""
+                  className="w-25 h-25 rounded-2xl shadow object-cover"
+                />
+                <img
+                  src={productDetail.image}
+                  alt=""
+                  className="w-25 h-25 rounded-2xl shadow object-cover"
+                />
+                <img
+                  src={productDetail.image}
+                  alt=""
+                  className="w-25 h-25 rounded-2xl shadow object-cover"
+                />
+                <img
+                  src={productDetail.image}
+                  alt=""
+                  className="w-25 h-25 rounded-2xl shadow object-cover"
+                />
+              </div>
+            </figure>
 
-            <section className="w-full px-5">
+            <div className="w-145 ml-5">
               <div className="w-full h-10/12 space-y-1">
-                <h1 className="font-medium text-3xl">{productDetail.title}</h1>
-                <h2 className="font-medium text-4xl text-primary">
-                  RP. {productDetail.price}
-                </h2>
-                <div className="mt-5 flex flex-col gap-3 text-sm">
-                  <div className="flex items-center">
-                    <img src={condition} alt="" className="w-7 h-7" />
+                <header className="flex flex-col gap-2">
+                  <h2 className="font-normal text-3xl text-gray">
+                    {productDetail.title}
+                  </h2>
+                  <p className="font-semibold text-4xl text-primary">
+                    RP. {productDetail.price}
+                  </p>
+                </header>
+
+                <figure className="mt-10 flex justify-between text-lg text-gray">
+                  <figcaption className="flex items-center gap-2">
+                    <img src={box} alt="" className="w-7 h-7" />
                     <p>Seperti Baru</p>
-                  </div>
-                  <div className="flex items-center">
+                  </figcaption>
+                  <figcaption className="flex items-center gap-2">
                     <img src={payment} alt="" className="w-7 h-7" />
                     <p>COD</p>
-                  </div>
-                  <div className="flex items-center">
-                    <img src={lokasi} alt="" className="w-7 h-7" />
+                  </figcaption>
+                  <figcaption className="flex items-center gap-2">
+                    <img src={lokasi} alt="" className="w-6 h-7" />
                     <p>Dau</p>
-                  </div>
-                </div>
-                <div className="w-full bg-gray-400 p-0.5 mt-5 rounded-full"></div>
+                  </figcaption>
+                </figure>
 
-                <div className="mt-3 w-full h-4/12">
+                <section className="flex justify-between mt-10 border rounded-2xl pt-5 px-3 w-145 h-35">
+                  <div className="space-y-5">
+                    <div className="flex gap-2.5">
+                      {/* <img src="" alt="" /> */}
+                      <div className="w-10 h-10 rounded-full bg-gray-600"></div>
+                      <p className="text-xl font-medium">Nama Seller</p>
+                    </div>
+
+                    <div className="flex gap-1 text-white font-semibold text-sm">
+                      <button className="w-70 h-10 bg-primary rounded-full cursor-pointer hover:bg-sky-600">
+                        <p>Chat</p>
+                      </button>
+                      <button className="w-45 h-10 bg-primary rounded-full cursor-pointer hover:bg-sky-600">
+                        <p>Tukar Tambah</p>
+                      </button>
+                      <button className=" w-15 h-10 bg-primary rounded-full cursor-pointer hover:bg-sky-600 flex items-center justify-center">
+                        <LuHeart className="w-7 h-7" />
+                      </button>
+                    </div>
+                  </div>
+                </section>
+
+                <section className="mt-10 w-full h-auto">
                   <h2 className="font-medium text-2xl text-primary mt-5">
                     Deskripsi Produk
                   </h2>
@@ -73,32 +151,14 @@ const Detail = ({}: IProduct) => {
                     eget ac sapien. Dolor habitant sollicitudin mattis cursus
                     elit ullamcorper.
                   </p>
-                </div>
-
-                <div className="flex justify-between">
-                  <div>
-                    <img src="" alt="" />
-                    <p className="text-xl font-medium">Nama User</p>
-                  </div>
-                  <div className="flex gap-2 text-white font-medium">
-                    <button className="w-64 h-10 bg-primary rounded-xl cursor-pointer hover:bg-sky-600">
-                      Beli Sekarang
-                    </button>
-                    <button>
-                      <img src={whatsApp} alt="" className="w-10 h-10 p-1 bg-primary rounded-xl cursor-pointer hover:bg-sky-600" />
-                    </button>
-                    <button>
-                      <img src={wCart} alt="" className="w-10 h-10 p-1 bg-primary rounded-xl cursor-pointer hover:bg-sky-600" />
-                    </button>
-                  </div>
-                </div>
+                </section>
               </div>
-            </section>
+            </div>
             <section></section>
-          </div>
-        </div>
-      </div>
-    </div>
+          </article>
+        </section>
+      </main>
+    </header>
   );
 };
 
