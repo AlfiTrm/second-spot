@@ -3,7 +3,6 @@ import Home from "./components/view/user/Home";
 import MainLayout from "./layout/MainLayout";
 import Login from "./components/view/auth/Login";
 import Detail from "./components/view/user/Detail";
-import Chat from "./components/view/user/Chat";
 import Register from "./components/view/auth/Register";
 import Favorite from "./components/view/user/Favorite";
 import Profile from "./components/view/user/Profile";
@@ -33,10 +32,6 @@ const router = createBrowserRouter([
         />
       </MainLayout>
     ),
-  },
-  {
-    path: "/chat",
-    element: <Chat />,
   },
   {
     path: "/favorite",
