@@ -6,13 +6,13 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import { END_API } from "../../../api/api";
 import { IProduct } from "../../../data/Type";
-import { ICart } from "../../../data/Type";
+import { CartProps } from "../../../data/Type";
 
 const ProductCards = (props: IProduct) => {
   const navigate = useNavigate();
   const [isHovered, setIsHovered] = useState<boolean>(false);
   const [isLiked, setIsLiked] = useState<boolean>(false);
-  const [favorite, setFavorite] = useState<ICart[]>([]);
+  const [favorite, setFavorite] = useState<CartProps[]>([]);
 
   useEffect(() => {
     const saveFavorite = JSON.parse(localStorage.getItem("favorites") || "[]");
@@ -38,7 +38,7 @@ const ProductCards = (props: IProduct) => {
         userID: userId,
         product: product,
       });
-      const data: ICart[] = response.data;
+      const data: CartProps[] = response.data;
       setFavorite(data);
 
       const saveFavorite = JSON.parse(
