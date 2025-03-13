@@ -18,3 +18,13 @@ export type UserProps = {
   password: string;
   confirm_password: string;
 };
+
+export type CartProps = {
+  userId: number;
+  product: IProduct[];
+};
+
+export type CategoryProps = {
+  imageSrc: string;
+  text: string;
+};
