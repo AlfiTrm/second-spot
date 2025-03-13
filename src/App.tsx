@@ -1,13 +1,14 @@
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
-import Home from "./components/view/user/Home";
+import Home from "./components/view/home/Home";
 import MainLayout from "./layout/MainLayout";
 import Login from "./components/view/auth/Login";
-import Detail from "./components/view/user/Detail";
+import Detail from "./components/view/main/Detail";
 import Register from "./components/view/auth/Register";
-import Favorite from "./components/view/user/Favorite";
+import Favorite from "./components/view/main/Favorite";
 import Profile from "./components/view/user/Profile";
 import ChangeProfile from "./components/view/user/ChangeProfile";
-import Sell from "./components/view/user/Sell";
+import Sell from "./components/view/main/Sell";
+import PasswordChange from "./components/view/user/PasswordChange";
 
 const router = createBrowserRouter([
   {
@@ -29,6 +30,7 @@ const router = createBrowserRouter([
           category={""}
           description={""}
           image={""}
+          userId={""}
         />
       </MainLayout>
     ),
@@ -50,10 +52,18 @@ const router = createBrowserRouter([
     ),
   },
   {
-    path: "/profile/change",
+    path: "/profile/changeProfile",
     element: (
       <MainLayout>
         <ChangeProfile />
+      </MainLayout>
+    ),
+  },
+  {
+    path: "/profile/changePassword",
+    element: (
+      <MainLayout>
+        <PasswordChange />
       </MainLayout>
     ),
   },
