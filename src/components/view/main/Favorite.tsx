@@ -2,8 +2,10 @@ import { useEffect, useState } from "react";
 import { FiSearch } from "react-icons/fi";
 import ProductCards from "../../partial/home/ProductCards";
 import { IProduct } from "../../../data/Type";
+import { useUser } from "@clerk/clerk-react";
 
 const Favorite: React.FC = () => {
+  const { user } = useUser();
   const [search] = useState<string>("");
   const [sortOrder] = useState<string>("");
   const [product, setProduct] = useState<IProduct[]>([]);
@@ -28,7 +30,7 @@ const Favorite: React.FC = () => {
 
   useEffect(() => {
     getFavoriteProducts();
-  }, []);
+  }, [user?.id]);
 
   return (
     <div className="md:w-full sm:w-full w-lvh overflow-hidden">
@@ -49,7 +51,7 @@ const Favorite: React.FC = () => {
 
         <form className="w-95 h-12">
           <select className="w-full h-full px-2.5 border bg-white border-gray-300 rounded-full">
-            <option selected>Pilih lokasi</option>
+            <option value="Pilih Lokasi">Pilih lokasi</option>
             <option value="1">Sukun</option>
             <option value="2">Dau</option>
             <option value="3">Ngawi</option>
@@ -61,8 +63,10 @@ const Favorite: React.FC = () => {
       </header>
       <section className=" bg-main pt-12 pb-12 px-16 2xl:px-32 flex justify-center items-center mt-10">
         <div className="grid grid-cols-2 lg:grid-cols-4 md:grid-cols-3 gap-10 ">
-          {filteredProducts.length> 0 ? (
-            filteredProducts.map((product) => <ProductCards key={product.id} {...product} />)
+          {filteredProducts.length > 0 ? (
+            filteredProducts.map((product) => (
+              <ProductCards key={product.id} {...product} />
+            ))
           ) : (
             <p>Belum ada Favorit</p>
           )}
