@@ -1,157 +1,193 @@
 import { Link, useNavigate } from "react-router-dom";
 import { FormEvent, useState } from "react";
 import { BiHide, BiShowAlt } from "react-icons/bi";
-import axios from "axios";
-import { END_AUTH } from "../../../api/api";
-
-type UserProps = {
-  id: number;
-  username: string;
-  email: string;
-  password: string;
-  confirm_password: string;
-};
+import logo from "../../../assets/logo/logo.webp";
+import { useSignUp } from "@clerk/clerk-react";
+import { useClerk } from "@clerk/clerk-react";
 
 const Register = () => {
+  const { signUp } = useSignUp();
+  const { signOut } = useClerk();
   const [showPassword, setShowPassword] = useState<boolean>(false);
   const [showConfirmPassword, setShowConfirmPassword] =
     useState<boolean>(false);
-  const [user, setUser] = useState<UserProps>({} as UserProps);
+
+  const [username, setUsername] = useState<string>("");
+  const [email, setEmail] = useState<string>("");
+  const [password, setPassword] = useState<string>("");
+  const [confirmPassword, setConfirmPassword] = useState<string>("");
+
+  const [pendingVerif, setPendingVerif] = useState<boolean>(false);
+  const [code, setCode] = useState<string>("");
+
   const navigate = useNavigate();
 
   const handleRegister = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    const userData = {
-      email: user.email,
-      username: user.username,
-      password: user.password,
-      confirm_password: user.confirm_password,
-    };
+    if (password != confirmPassword) {
+      alert("Password anda tidak sesuai.");
+      return;
+    }
 
     try {
-      const response = await axios.post(`${END_AUTH.REGISTER}`, userData);
-      const data = await response.data;
-      console.log(data);
-      setUser(data);
-      navigate("/Login");
+      await signUp?.create({
+        username,
+        emailAddress: email,
+        password,
+      });
+
+      await signUp?.prepareEmailAddressVerification();
+      setPendingVerif(true);
     } catch (error) {
-      console.error("as", error);
+      console.error("Registrasi Gagal", error);
+    }
+  };
+
+  const handleVerification = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    try {
+      const result = await signUp?.attemptEmailAddressVerification({ code });
+      if (result?.status === "complete") {
+        await signOut();
+        alert("Silahkan Login");
+        navigate("/Login");
+      } else {
+        alert("Kode verifikasi tidak valid");
+      }
+    } catch (error) {
+      console.error("Verifikasi gagal", error);
     }
   };
 
   return (
     <div>
-      <div className="font-primary w-full h-lvh bg-white">
-        <div className="flex lg:justify-between justify-center items-center h-full lg:px-52 2xl:px-56">
-          
-          <section className="text-primary border min-w-4/12 md:w-6/12 lg:w-6/12 lg:flex hidden md:visible flex-col gap-10">
-            <div className="flex justify-center">ini logo</div>
-            {/* <p>
-              Second Spot adalah platform jual beli barang bekas yang dirancang
-              khusus untuk mahasiswa dan masyarakat di Malang. Dengan fokus pada
-              kemudahan, keamanan, dan transparansi transaksi, Second Spot
-              menjadi solusi bagi mereka yang ingin menjual atau membeli barang
-              bekas dengan lebih nyaman dan terpercaya.
-            </p> */}
-          </section>
+      <div className="font-primary w-full h-lvh bg-white flex">
+        <section className=" bg-white w-full md:flex justify-center items-center h-full hidden">
+          <figure className="text-primary min-w-4/12 md:w-6/12 ">
+            <img src={logo} alt="" />
+          </figure>
+        </section>
 
-          <section className="w-110 h-150 lg:w-120 2xl:h-150 bg-white rounded-xl shadow-2xl shadow-gray-500">
+        <section className="w-full bg-primary flex items-center justify-center">
+          <section className="w-90 h-150 2xl:w-120 2xl:h-150 bg-white rounded-xl shadow-2xl shadow-gray-500">
             <div className="px-8 pt-17 flex flex-col gap-8">
-              <div className="font-semibold text-primary lg:text-3xl 2xl:text-4xl">
-                <h2>Daftar</h2>
-              </div>
-              <form onSubmit={handleRegister} key={user.id}>
-                <div className="w-full flex flex-col gap-8">
+              <h2 className="font-semibold text-primary text-xl lg:text-3xl 2xl:text-4xl">
+                Daftar
+              </h2>
+              {pendingVerif ? (
+                <form
+                  onSubmit={handleVerification}
+                  className="flex gap-2 flex-col"
+                >
                   <input
-                    value={user.email}
-                    type="email"
-                    placeholder="email"
-                    onChange={(e) =>
-                      setUser({ ...user, email: e.target.value })
-                    }
-                    required
-                    className="shadow shadow-primary/50 w-full h-10 px-3 rounded-full"
-                  />
-                  <input
-                    value={user.username}
                     type="text"
-                    placeholder="username"
-                    onChange={(e) =>
-                      setUser({ ...user, username: e.target.value })
-                    }
+                    value={code}
+                    onChange={(e) => setCode(e.target.value)}
+                    placeholder="Masukkan kode verifikasi"
                     required
-                    className="shadow shadow-primary/50 w-full h-10 p-2 rounded-full"
+                    className="p-2 shadow-lg shadow-gray-300 border border-gray-300 rounded-xl"
                   />
-                  <div className="relative">
+                  <button
+                    type="submit"
+                    className="py-2 px-4 bg-primary text-white shadow-lg shadow-gray-300 rounded-xl hover:bg-sky-600 transition-all cursor-pointer"
+                  >
+                    Verifikasi
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setPendingVerif(false)}
+                    className="py-2 px-4 bg-gray-400 text-white shadow-lg shadow-gray-300 rounded-xl hover:bg-gray-500 transition-all cursor-pointer"
+                  >
+                    Kembali
+                  </button>
+                </form>
+              ) : (
+                <form onSubmit={handleRegister}>
+                  <div className="w-full flex flex-col gap-8">
                     <input
-                      value={user.password}
-                      type={showPassword ? "text" : "password"}
-                      placeholder="password"
-                      onChange={(e) =>
-                        setUser({ ...user, password: e.target.value })
-                      }
+                      value={username}
+                      type="text"
+                      placeholder="username"
+                      onChange={(e) => setUsername(e.target.value)}
                       required
-                      className="shadow shadow-primary/50 w-full h-10 p-2 rounded-full"
+                      className="w-full h-10 px-3 rounded-full border border-primary"
                     />
-                    <button
-                      type="button"
-                      onClick={() => setShowPassword(!showPassword)}
-                      className="absolute right-3 top-2.5 text-gray-500"
-                    >
-                      {showPassword ? (
-                        <BiHide size={25} />
-                      ) : (
-                        <BiShowAlt size={25} />
-                      )}
-                    </button>
-                  </div>
-
-                  <div className="relative">
                     <input
-                      value={user.confirm_password}
-                      type={showConfirmPassword ? "text" : "password"}
-                      placeholder="konfirmasi password"
-                      onChange={(e) =>
-                        setUser({ ...user, confirm_password: e.target.value })
-                      }
+                      value={email}
+                      type="email"
+                      placeholder="email"
+                      onChange={(e) => setEmail(e.target.value)}
                       required
-                      className="shadow shadow-primary/50 w-full h-10 p-2 rounded-full"
+                      className="w-full h-10 px-3 rounded-full border border-primary"
                     />
-                    <button
-                      type="button"
-                      onClick={() =>
-                        setShowConfirmPassword(!showConfirmPassword)
-                      }
-                      className="absolute right-3 top-2.5 text-gray-500"
-                    >
-                      {showConfirmPassword ? (
-                        <BiHide size={25} />
-                      ) : (
-                        <BiShowAlt size={25} />
-                      )}
-                    </button>
-                  </div>
+                    <div className="relative">
+                      <input
+                        value={password}
+                        type={showPassword ? "text" : "password"}
+                        placeholder="password"
+                        onChange={(e) => setPassword(e.target.value)}
+                        required
+                        className="w-full h-10 px-3 rounded-full border border-primary"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowPassword(!showPassword)}
+                        className="absolute right-3 top-2.5 text-gray-500"
+                      >
+                        {showPassword ? (
+                          <BiHide size={25} />
+                        ) : (
+                          <BiShowAlt size={25} />
+                        )}
+                      </button>
+                    </div>
 
-                  <div className="flex flex-col items-center gap-8">
-                    <button
-                      type="submit"
-                      className="flex justify-center cursor-pointer bg-primary text-white font-semibold items-center w-1/2 h-10 shadow shadow-gray-500 rounded-full hover:bg-sky-600"
-                    >
-                      <h3>DAFTAR</h3>
-                    </button>
-                    <p>
-                      Sudah punya akun?
-                      <span className="text-primary cursor-pointer">
-                        <Link to={"/Login"}> Masuk</Link>
-                      </span>
-                    </p>
+                    <div className="relative">
+                      <input
+                        value={confirmPassword}
+                        type={showConfirmPassword ? "text" : "password"}
+                        placeholder="konfirmasi password"
+                        onChange={(e) => setConfirmPassword(e.target.value)}
+                        required
+                        className="w-full h-10 px-3 rounded-full border border-primary"
+                      />
+                      <button
+                        type="button"
+                        onClick={() =>
+                          setShowConfirmPassword(!showConfirmPassword)
+                        }
+                        className="absolute right-3 top-2.5 text-gray-500"
+                      >
+                        {showConfirmPassword ? (
+                          <BiHide size={25} />
+                        ) : (
+                          <BiShowAlt size={25} />
+                        )}
+                      </button>
+                    </div>
+
+                    <div className="flex flex-col items-center gap-8">
+                      <button
+                        type="submit"
+                        className="flex justify-center cursor-pointer bg-primary text-white font-semibold items-center w-1/2 h-10 shadow shadow-gray-500 rounded-full hover:bg-sky-600"
+                      >
+                        <h3>DAFTAR</h3>
+                      </button>
+                      <p>
+                        Sudah punya akun?
+                        <span className="text-primary cursor-pointer font-semibold">
+                          <Link to={"/Login"}> Masuk</Link>
+                        </span>
+                      </p>
+                    </div>
                   </div>
-                </div>
-              </form>
+                </form>
+              )}
             </div>
           </section>
-        </div>
+        </section>
       </div>
     </div>
   );
