@@ -29,6 +29,7 @@ const Favorite: React.FC = () => {
   useEffect(() => {
     getFavoriteProducts();
   }, []);
+
   return (
     <div className="md:w-full sm:w-full w-lvh overflow-hidden">
       <section className="mt-30 flex gap-5 justify-center items-center">
@@ -60,8 +61,8 @@ const Favorite: React.FC = () => {
       </header>
       <section className=" bg-main pt-12 pb-12 px-16 2xl:px-32 flex justify-center items-center mt-10">
         <div className="grid grid-cols-2 lg:grid-cols-4 md:grid-cols-3 gap-10 ">
-          {product ? (
-            filteredProducts.map((product) => <ProductCards {...product} />)
+          {filteredProducts.length> 0 ? (
+            filteredProducts.map((product) => <ProductCards key={product.id} {...product} />)
           ) : (
             <p>Belum ada Favorit</p>
           )}
