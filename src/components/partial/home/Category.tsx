@@ -1,7 +1,4 @@
-type CategoryProps = {
-  imageSrc: string;
-  text: string;
-};
+import { CategoryProps } from "../../../data/Type";
 
 const Category: React.FC<CategoryProps> = ({ imageSrc, text }) => {
   return (
