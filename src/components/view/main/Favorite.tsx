@@ -71,7 +71,7 @@ const Favorite: React.FC = () => {
             <p>Belum ada Favorit</p>
           )}
         </div>
-      </section>{" "}
+      </section>
     </div>
   );
 };
