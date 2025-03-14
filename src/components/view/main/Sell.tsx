@@ -16,6 +16,7 @@ const Sell: React.FC = () => {
   const [price, setPrice] = useState<string>("");
   const [description, setDescription] = useState<string>("");
   const [nextId, setNextId] = useState<number | null>(null);
+  const [dealMethod, setDealMethod] = useState<string[]>([]);
 
   const handleImage = (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files;
@@ -85,6 +86,7 @@ const Sell: React.FC = () => {
       description,
       image,
       userId: user?.id,
+      metode_kesepakatan: dealMethod,
     };
 
     const { error } = await supabase.from("products").insert(newProduct);
@@ -92,6 +94,17 @@ const Sell: React.FC = () => {
     if (error) {
       console.error("gagal menyimpan produk: ", error.message);
       alert("gagal menyimpan produk");
+      return;
+    }
+
+    const { error: updateError } = await supabase
+      .from("users")
+      .update({ is_seller: true })
+      .eq("id", user?.id);
+
+    if (updateError) {
+      console.error("gagal update is_seller: ", updateError.message);
+      alert("Produk terpasang, tapi gagal update status seller.");
       return;
     }
 
@@ -103,14 +116,14 @@ const Sell: React.FC = () => {
     setPrice("");
     setDescription("");
     setImage([]);
-
+    setDealMethod([]);
     setNextId((nextId ?? 0) + 1);
   };
 
   return (
     <div className="md:w-full sm:w-full w-lvh overflow-hidden">
       <div className="flex flex-col items-center mt-20 p-5 ">
-        <header className="text-primary font-semibold w-185 text-4xl ">
+        <header className="text-primary md:text-start text-center font-semibold w-185 text-4xl ">
           <h2>Jual</h2>
         </header>
 
@@ -119,7 +132,7 @@ const Sell: React.FC = () => {
           className="flex flex-col mt-5 gap-5"
           action=""
         >
-          <div className="w-185 h-65 flex-col flex items-center relative border rounded-2xl">
+          <div className="max-w-185 md:w-150 w-100 h-65 flex-col flex items-center relative border rounded-2xl">
             <MdImage className=" w-7 h-7 mt-5 text-primary" />
             <label className="flex justify-center items-center mt-5 w-40 h-10 cursor-pointer bg-primary text-white rounded-full hover:bg-sky-700">
               Pilih Foto
@@ -165,10 +178,13 @@ const Sell: React.FC = () => {
             className="h-10 border rounded-2xl px-5"
           >
             <option value="">Pilih kategori</option>
-            <option value="men's clothing">Men's Clothing</option>
-            <option value="women's clothing">Women's Clothing</option>
-            <option value="jewelery">Jewelery</option>
-            <option value="electronics">Electronics</option>
+            <option value="Buku & Alat Tulis">Buku & Alat Tulis</option>
+            <option value="Elektronik & Gadget">Elektronik & Gadget</option>
+            <option value="Kendaraan">Kendaraan</option>
+            <option value="electronics">Perabotan Kos</option>
+            <option value="electronics">Fashion & Aksesoris</option>
+            <option value="electronics">Olahraga & Hobi</option>
+            <option value="electronics">Tiket & Voucher</option>
           </select>
 
           <select
@@ -176,10 +192,13 @@ const Sell: React.FC = () => {
             onChange={(e) => setCondition(e.target.value)}
             className="h-10 border rounded-2xl px-5"
           >
-            <option value="">Pilih kondisi</option>
+            <option value="Kondisi">Kondisi</option>
             <option value="Baru">Baru</option>
-            <option value="Normal">Normal</option>
-            <option value="Bekas">Bekas</option>
+            <option value="Seperti Baru">Seperti Baru</option>
+            <option value="Preloved">Preloved</option>
+            <option value="Kondisi Baik">Kondisi Baik</option>
+            <option value="Layak Pakai">Layak Pakai</option>
+            <option value="Apa Adanya">Apa Adanya</option>
           </select>
 
           <select
@@ -188,11 +207,45 @@ const Sell: React.FC = () => {
             className="h-10 border rounded-2xl px-5"
           >
             <option value="">Pilih lokasi</option>
-            <option value="Sukun">Sukun</option>
-            <option value="Dau">Dau</option>
-            <option value="Ngawi">Ngawi</option>
+            <option value="Sukun">Dau</option>
+            <option value="Dau">Lowokwaru</option>
+            <option value="Ngawi">Dieng</option>
           </select>
+          <div className="flex flex-col gap-2">
+            <label>
+              <input
+                type="checkbox"
+                value="Langsung"
+                checked={dealMethod.includes("Langsung")}
+                onChange={(e) =>
+                  setDealMethod((prev) =>
+                    e.target.checked
+                      ? [...prev, e.target.value]
+                      : prev.filter(
+                          (method: string) => method !== e.target.value
+                        )
+                  )
+                }
+              />
+              Langsung
+            </label>
 
+            <label>
+              <input
+                type="checkbox"
+                value="COD"
+                checked={dealMethod.includes("COD")}
+                onChange={(e) =>
+                  setDealMethod((prev) =>
+                    e.target.checked
+                      ? [...prev, e.target.value]
+                      : prev.filter((method) => method !== e.target.value)
+                  )
+                }
+              />
+              COD
+            </label>
+          </div>
           <input
             type="text"
             value={price}
