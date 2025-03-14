@@ -1,8 +1,9 @@
-import { Realtime } from "ably";
+import Ably from "ably";
 import { useUser } from "@clerk/clerk-react";
 
 const useAblyClient = () => {
   const { user } = useUser();
+  const { Realtime } = Ably;
 
   if (!user) {
     return null;
@@ -12,7 +13,7 @@ const useAblyClient = () => {
     key: import.meta.env.VITE_ABLY_API_KEY,
     clientId: user.id,
   });
-  console.log(import.meta.env.VITE_ABLY_API_KEY)
+  console.log(import.meta.env.VITE_ABLY_API_KEY);
 
   AblyClient.connection.on("connected", () => {
     console.log("Ably Connected");
