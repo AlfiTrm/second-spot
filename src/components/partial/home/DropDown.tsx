@@ -23,11 +23,6 @@ const CustomDropdown: React.FC<CustomDropdownProps> = ({
     plain: "bg-white border border-gray-300 text-black",
   };
 
-  const hoverStyle = {
-    default: "hover:bg-white text-primary",
-    plain: "hover:bg-gray-200 border border-gray-300 text-black",
-  };
-
   const handleSelect = (option: string) => {
     onChange(option);
     setIsOpen(false);
