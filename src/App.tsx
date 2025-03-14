@@ -9,6 +9,7 @@ import Profile from "./components/view/user/Profile";
 import ChangeProfile from "./components/view/user/ChangeProfile";
 import Sell from "./components/view/main/Sell";
 import PasswordChange from "./components/view/user/PasswordChange";
+import Chat from "./components/view/main/ChatRoom";
 
 const router = createHashRouter([
   {
@@ -72,6 +73,14 @@ const router = createHashRouter([
     element: (
       <MainLayout>
         <Sell />
+      </MainLayout>
+    ),
+  },
+  {
+    path: "/chat",
+    element: (
+      <MainLayout>
+        <Chat />
       </MainLayout>
     ),
   },
