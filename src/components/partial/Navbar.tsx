@@ -12,6 +12,7 @@ const Navbar: React.FC = () => {
   const { user } = useUser();
   const [isMenuOpen, setIsMenuOpen] = useState<boolean>(false);
   const [isHovered, setIsHovered] = useState<boolean>(false);
+  const [isProfileHovered, setIsProfileHovered] = useState<boolean>(false);
   const navigate = useNavigate();
 
   return (
@@ -52,6 +53,8 @@ const Navbar: React.FC = () => {
             <>
               <div className="flex gap-6 text-primary">
                 <button
+                  onMouseEnter={() => setIsProfileHovered(true)}
+                  onMouseLeave={() => setIsProfileHovered(false)}
                   onClick={() => navigate("/profile")}
                   className="flex items-center gap-1 cursor-pointer"
                 >
@@ -61,6 +64,27 @@ const Navbar: React.FC = () => {
                   ></img>
                   <p className="text-xs">{user.username}</p>
                 </button>
+                {isProfileHovered && (
+                  <div className="absolute top-12 right-auto w-32 transition-all duration-700 bg-white shadow-lg rounded-md border border-gray-200">
+                    <Link
+                      onMouseEnter={() => setIsProfileHovered(true)}
+                      onMouseLeave={() => setIsProfileHovered(false)}
+                      to={"/profile"}
+                      className="block px-4 py-2 text-sm text-primary hover:bg-gray-100 cursor-pointer"
+                    >
+                      Profil
+                    </Link>
+                    <SignOutButton>
+                      <button
+                        onMouseEnter={() => setIsProfileHovered(true)}
+                        onMouseLeave={() => setIsProfileHovered(false)}
+                        className="block w-full text-left px-4 py-2 text-sm text-red-500 hover:bg-red-100 cursor-pointer"
+                      >
+                        Keluar
+                      </button>
+                    </SignOutButton>
+                  </div>
+                )}
                 <button
                   onMouseEnter={() => setIsHovered(true)}
                   onMouseLeave={() => setIsHovered(false)}
