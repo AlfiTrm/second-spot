@@ -1,64 +1,55 @@
-import axios from "axios";
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
-import { END_API } from "../../../api/api";
+import { useNavigate, useParams } from "react-router-dom";
 import { IProduct } from "../../../data/Type";
 import lokasi from "../../../assets/detail/location.webp";
 import box from "../../../assets/detail/box.webp";
 import payment from "../../../assets/detail/handShake.webp";
 import { FiSearch } from "react-icons/fi";
 import { LuHeart } from "react-icons/lu";
+import supabase from "../../../utils/supabase";
 
 const Detail = ({}: IProduct) => {
   const { id } = useParams();
   const [productDetail, setProductDetail] = useState<IProduct | null>(null);
   const [selectedImage, setSelectedImage] = useState<string>("");
-
+  const navigate = useNavigate();
+  const [sellerName, setSellerName] = useState<string>("");
   const getProductDetail = async () => {
-    try {
-      const response = await axios.get(`${END_API.BASE_URL}/products/${id}`);
-      const data = response.data;
-      console.log(data.image);
-      setProductDetail(data);
+    const { data, error } = await supabase
+      .from("products")
+      .select("*")
+      .eq("id", Number(id))
+      .single();
 
-      if (data) {
-        const imagesArray = [
-          data.image,
-          `${data.image}?v=1`,
-          `${data.image}?v=2`,
-          `${data.image}?v=3`,
-          `${data.image}?v=4`,
-        ];
+    if (error) {
+      console.error("Error fetching product detail:", error);
+      return;
+    }
 
-        setProductDetail({ ...data, images: imagesArray });
-        setSelectedImage(imagesArray[0]);
-      } else {
-        throw new Error("Data tidak ditemukan");
+    const getSellerName = async (userId: string) => {
+      const { data, error } = await supabase
+        .from("users")
+        .select("username")
+        .eq("id", userId)
+        .single();
+
+      if (error) {
+        console.error("Error fetching seller name:", error);
+        return "Penjual tidak diketahui";
       }
-    } catch (error) {
-      const localData: IProduct[] = JSON.parse(
-        localStorage.getItem("products") || "[]"
-      );
-      const product = localData.find((product) => product.id === Number(id));
-      if (product) {
-        const imagesArray = Array.isArray(product.image)
-          ? product.image
-          : [
-              product.image,
-              `${product.image}?v=1`,
-              `${product.image}?v=2`,
-              `${product.image}?v=3`,
-              `${product.image}?v=4`,
-            ];
 
-        setProductDetail({ ...product, images: imagesArray });
-        setSelectedImage(imagesArray[0]);
-      } else {
-        console.log("Data tidak ditemukan");
-      }
-      console.log("Failed");
+      return data?.username || "Penjual tidak diketahui";
+    };
+
+    if (data) {
+      const imagesArray = Array.isArray(data.image) ? data.image : [data.image];
+      const seller = await getSellerName(data.userId);
+      setSellerName(seller);
+      setProductDetail({ ...data, images: imagesArray });
+      setSelectedImage(imagesArray[0]);
     }
   };
+  console.log(sellerName);
   const handleSelectImage = (img: string) => {
     setSelectedImage(img);
   };
@@ -75,8 +66,6 @@ const Detail = ({}: IProduct) => {
             <form action="" className="relative">
               <input
                 type="search"
-                name=""
-                id=""
                 placeholder="Cari Produk"
                 className="lg:w-120 md:w-90 2xl:w-195 w-60 h-12 px-5 border border-gray-300 bg-white shadow-gray-200 rounded-full"
               />
@@ -88,7 +77,7 @@ const Detail = ({}: IProduct) => {
 
             <form className="w-full h-12">
               <select className="md:w-80 w-40 h-full px-2.5 border bg-white border-gray-300 rounded-full">
-                <option selected>Pilih lokasi</option>
+                <option value="Pilih lokasi">Pilih lokasi</option>
                 <option value="1">Sukun</option>
                 <option value="2">Dau</option>
                 <option value="3">Ngawi</option>
@@ -136,7 +125,7 @@ const Detail = ({}: IProduct) => {
                       <figcaption className="flex items-center gap-2">
                         <img
                           src={box}
-                          alt=""
+                          alt="box"
                           className="2xl:w-7 2xl:h-7 w-5 h-5 "
                         />
                         <p>{productDetail?.condition}</p>
@@ -144,7 +133,7 @@ const Detail = ({}: IProduct) => {
                       <figcaption className="flex items-center gap-2">
                         <img
                           src={payment}
-                          alt=""
+                          alt="payment"
                           className="2xl:w-7 2xl:h-7 w-5 h-5"
                         />
                         <p>{}</p>
@@ -152,7 +141,7 @@ const Detail = ({}: IProduct) => {
                       <figcaption className="flex items-center gap-2">
                         <img
                           src={lokasi}
-                          alt=""
+                          alt="location"
                           className="2xl:w-6 2xl:h-7 w-4 h-5"
                         />
                         <p>{productDetail?.location}</p>
@@ -164,11 +153,16 @@ const Detail = ({}: IProduct) => {
                         <div className="flex gap-2.5">
                           {/* <img src="" alt="" /> */}
                           <div className="w-10 h-10 rounded-full bg-gray-600"></div>
-                          <p className="text-xl font-medium">Nama Seller</p>
+                          <p className="text-xl font-medium">
+                            {sellerName}
+                          </p>
                         </div>
 
                         <div className="flex gap-1 text-white font-semibold text-sm">
-                          <button className="2xl:w-70 w-40 h-10 bg-primary rounded-full cursor-pointer hover:bg-sky-600">
+                          <button
+                            onClick={() => navigate(`/chat`)}
+                            className="2xl:w-70 w-40 h-10 bg-primary rounded-full cursor-pointer hover:bg-sky-600"
+                          >
                             <p>Chat</p>
                           </button>
                           <button className="2xl:w-45 w-40 h-10 bg-primary rounded-full cursor-pointer hover:bg-sky-600">
