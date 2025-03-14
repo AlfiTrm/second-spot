@@ -4,6 +4,7 @@ import { IProduct } from "../../../data/Type";
 import axios from "axios";
 import { END_API } from "../../../api/api";
 import { useUser } from "@clerk/clerk-react";
+import supabase from "../../../utils/supabase";
 
 const Sell: React.FC = () => {
   const { user } = useUser();
@@ -41,7 +42,6 @@ const Sell: React.FC = () => {
         });
     }
   };
-
   const handleRemove = (index: number) => {
     setImage(image.filter((_, i) => i !== index));
   };
@@ -68,7 +68,7 @@ const Sell: React.FC = () => {
     getLastId();
   }, []);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (!title || !category || !condition || !price || !description) {
@@ -77,7 +77,6 @@ const Sell: React.FC = () => {
     }
 
     const newProduct = {
-      id: nextId,
       title,
       category,
       condition,
@@ -88,9 +87,14 @@ const Sell: React.FC = () => {
       userId: user?.id,
     };
 
-    const existProducts = JSON.parse(localStorage.getItem("products") || "[]");
-    const updateProducts = [...existProducts, newProduct];
-    localStorage.setItem("products", JSON.stringify(updateProducts));
+    const { error } = await supabase.from("products").insert(newProduct);
+
+    if (error) {
+      console.error("gagal menyimpan produk: ", error.message);
+      alert("gagal menyimpan produk");
+      return;
+    }
+
     alert("Produk terpasang.");
     setTitle("");
     setCategory("");
