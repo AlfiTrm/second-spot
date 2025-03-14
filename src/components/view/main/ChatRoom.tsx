@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Realtime } from "ably";
 import { useUser } from "@clerk/clerk-react";
-
+import type { Message as AblyMessage } from "ably";
 interface Message {
   username: string;
   text: string;
@@ -17,7 +17,7 @@ const ChatRoom: React.FC = () => {
     const ably = new Realtime({ key: import.meta.env.VITE_ABLY_API_KEY });
     const channel = ably.channels.get("chatroom");
 
-    channel.subscribe("message", (message) => {
+    channel.subscribe("message", (message: AblyMessage) => {
       setMessages((prev) => [...prev, message.data]);
     });
 
