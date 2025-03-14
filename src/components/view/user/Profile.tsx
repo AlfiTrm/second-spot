@@ -10,6 +10,10 @@ const Profile = () => {
   const navigate = useNavigate();
   const [product, setProduct] = useState<IProduct[]>([]);
 
+  if (!user) {
+    navigate("/Login");
+  }
+
   useEffect(() => {
     const fetchUserProduct = async () => {
       const { data, error } = await supabase
