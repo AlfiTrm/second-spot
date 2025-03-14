@@ -3,7 +3,6 @@ import ProductCards from "../../partial/home/ProductCards";
 import { FiSearch } from "react-icons/fi";
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { END_API } from "../../../api/api";
 import { IProduct } from "../../../data/Type";
 
 const Home: React.FC = () => {
@@ -18,7 +17,15 @@ const Home: React.FC = () => {
 
   const getProducts = async () => {
     try {
-      const response = await axios.get(`${END_API.PRODUCTS}`);
+      const response = await axios.get(
+        `${import.meta.env.VITE_SUPABASE_URL}/rest/v1/products`,
+        {
+          headers: {
+            apikey: import.meta.env.VITE_SUPABASE_ANON_KEY,
+            Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
+          },
+        }
+      );
       const data: IProduct[] = response.data.map((item: IProduct) => ({
         ...item,
         location: getRandomLocation(),
