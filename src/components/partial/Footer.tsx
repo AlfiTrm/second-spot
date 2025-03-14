@@ -3,7 +3,7 @@ import logo from "../../assets/logo/logo.webp";
 const Footer = () => {
   return (
     <div className=" md:w-full sm:w-full w-lvh overflow-hidden">
-      <div className="flex flex-col md:flex-row bg-white border-t text-primary sm:w-full gap-10 md:gap-20 p-4">
+      <div className="flex flex-col md:flex-row  bg-white border-t text-primary sm:w-full gap-10 md:gap-20 p-4">
         <section className="w-full md:w-md 2xl:ml-48 mt-24 flex md:flex-col flex-row">
           <img src={logo} alt="" className="w-64 h-18" />
           <p className="font-medium text-base text-gray">
@@ -16,9 +16,9 @@ const Footer = () => {
           </p>
         </section>
 
-        <section className="flex gap-20 mt-16">
-          <div className="w-full md:w-52">
-            <h3 className="font-bold text-xl text-center md:text-left">
+        <section className="flex gap-20 mt-16 justify-center md:justify-between">
+          <div className="w--52 md:w-52">
+            <h3 className="font-bold text-xl text-left md:text-left">
               Kategori
             </h3>
 
@@ -48,6 +48,7 @@ const Footer = () => {
               </ul>
             </div>
           </div>
+
           <section>
             <h3 className="font-bold text-xl">Ikuti Kami</h3>
             <div className="flex flex-col md:flex-row gap-5 mt-2.5">
@@ -63,3 +64,4 @@ const Footer = () => {
 };
 
 export default Footer;
+
