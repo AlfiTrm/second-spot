@@ -1,183 +1,198 @@
-import Carousel from "../../partial/home/Carousel";
-import ProductCards from "../../partial/home/ProductCards";
-import { FiSearch } from "react-icons/fi";
-import React, { useEffect, useState } from "react";
-import axios from "axios";
+import { useEffect, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 import { IProduct } from "../../../data/Type";
+import lokasi from "../../../assets/detail/location.webp";
+import box from "../../../assets/detail/box.webp";
+import payment from "../../../assets/detail/handShake.webp";
+import { FiSearch } from "react-icons/fi";
+import { LuHeart } from "react-icons/lu";
+import supabase from "../../../utils/supabase";
 
-const Home: React.FC = () => {
-  const [product, setProduct] = useState<IProduct[]>([]);
-  const [allProduct, setAllProduct] = useState<IProduct[]>([]);
-  const [categoryFilter, setCategoryFilter] = useState<string>("Semua");
-  const [locationFilter, setLocationFilter] = useState<string>("Pilih lokasi");
-  const [conditionFilter, setConditionFilter] = useState<string>("Kondisi");
-  const [search, setSearch] = useState<string>("");
-  const [sortOrder, setSortOrder] = useState<string>("");
-  const [displayLimit, setDisplayLimit] = useState<number>(15);
+const Detail = ({}: IProduct) => {
+  const { id } = useParams();
+  const [productDetail, setProductDetail] = useState<IProduct | null>(null);
+  const [selectedImage, setSelectedImage] = useState<string>("");
+  const navigate = useNavigate();
+  const [sellerName, setSellerName] = useState<string>("");
+  const getProductDetail = async () => {
+    const { data, error } = await supabase
+      .from("products")
+      .select("*")
+      .eq("id", Number(id))
+      .single();
 
-  const getProducts = async () => {
-    try {
-      const response = await axios.get(
-        `${import.meta.env.VITE_SUPABASE_URL}/rest/v1/products`,
-        {
-          headers: {
-            apikey: import.meta.env.VITE_SUPABASE_ANON_KEY,
-            Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
-          },
-        }
-      );
-      const data: IProduct[] = response.data.map((item: IProduct) => ({
-        ...item,
-        location: getRandomLocation(),
-        condition: getRandomCondition(),
-      }));
+    if (error) {
+      console.error("Error fetching product detail:", error);
+      return;
+    }
 
-      const storedProducts = JSON.parse(
-        localStorage.getItem("products") || "[]"
-      );
-      const mergeProducts = [...data, ...storedProducts];
-      setAllProduct(mergeProducts);
-      setProduct(mergeProducts);
-    } catch (error) {
-      console.error("Failed to Fetch products", error);
+    const getSellerName = async (userId: string) => {
+      const { data, error } = await supabase
+        .from("users")
+        .select("username")
+        .eq("id", userId)
+        .single();
+
+      if (error) {
+        console.error("Error fetching seller name:", error);
+        return "Penjual tidak diketahui";
+      }
+
+      return data?.username || "Penjual tidak diketahui";
+    };
+
+    if (data) {
+      const imagesArray = Array.isArray(data.image) ? data.image : [data.image];
+      const seller = await getSellerName(data.userId);
+      setSellerName(seller);
+      setProductDetail({ ...data, images: imagesArray });
+      setSelectedImage(imagesArray[0]);
     }
   };
-
-  const getRandomLocation = () => {
-    const locations = ["Sukun", "Dau", "Ngawi"];
-    return locations[Math.floor(Math.random() * locations.length)];
-  };
-
-  const getRandomCondition = () => {
-    const conditions = ["Baru", "Normal", "Bekas"];
-    return conditions[Math.floor(Math.random() * conditions.length)];
+  console.log(sellerName);
+  const handleSelectImage = (img: string) => {
+    setSelectedImage(img);
   };
 
   useEffect(() => {
-    const storedProducts = JSON.parse(localStorage.getItem("products") || "[]");
-    const combinedProducts = [...allProduct, ...storedProducts];
-    const filteredProducts = combinedProducts
-      .filter(
-        (product) =>
-          (categoryFilter === "Semua" || product.category === categoryFilter) &&
-          (locationFilter === "Pilih lokasi" ||
-            product.location === locationFilter) &&
-          (conditionFilter === "Kondisi" ||
-            product.condition === conditionFilter) &&
-          product.title.toLowerCase().includes(search.toLowerCase())
-      )
-      .sort((a, b) =>
-        sortOrder === "asc" ? a.price - b.price : b.price - a.price
-      );
-
-    setProduct(filteredProducts);
-  }, [categoryFilter, locationFilter, conditionFilter, search, sortOrder]);
-
-  const removeDuplicateProducts = (products: IProduct[]) => {
-    const uniqueProducts = products.filter(
-      (product, index, self) =>
-        index === self.findIndex((p) => p.id === product.id)
-    );
-    return uniqueProducts;
-  };
-
-  useEffect(() => {
-    getProducts();
-  }, []);
+    getProductDetail();
+  }, [id]);
 
   return (
-    <div className="pt-30 w-lvh md:w-full sm:w-full">
-      <section>{search === "" && <Carousel />}</section>
+    <div className="md:w-full w-lvh">
+      <header className="">
+        <main className="flex flex-col items-center">
+          <section className="mt-30 flex gap-5 justify-center">
+            <form action="" className="relative">
+              <input
+                type="search"
+                placeholder="Cari Produk"
+                className="lg:w-120 md:w-90 2xl:w-195 w-60 h-12 px-5 border border-gray-300 bg-white shadow-gray-200 rounded-full"
+              />
+              <button className="cursor-pointer">
+                <div className="w-20 h-8 bg-primary absolute top-2 right-5 rounded-full"></div>
+                <FiSearch className="absolute text-white w-4 h-4 top-4 right-13" />
+              </button>
+            </form>
 
-      <section className="mt-10  flex gap-5 justify-center items-center">
-        <form action="" className="relative">
-          <input
-            type="search"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            name=""
-            id=""
-            placeholder="Cari Produk"
-            className="w-90 md:w-120 2xl:w-195 h-12 px-5 border border-gray-300 bg-white shadow-gray-200 rounded-full"
-          />
-          <button className="cursor-pointer">
-            <div className="w-20 h-8 bg-primary absolute top-2 right-5 rounded-full"></div>
-            <FiSearch className="absolute text-white w-4 h-4 top-4 right-13" />
-          </button>
-        </form>
+            <form className="w-full h-12">
+              <select className="md:w-80 w-40 h-full px-2.5 border bg-white border-gray-300 rounded-full">
+                <option value="Pilih lokasi">Pilih lokasi</option>
+                <option value="1">Sukun</option>
+                <option value="2">Dau</option>
+                <option value="3">Ngawi</option>
+              </select>
+            </form>
+          </section>
 
-        <form className="w-95 h-12">
-          <select
-            onChange={(e) => setLocationFilter(e.target.value)}
-            className="md:w-full w-80 h-full px-2.5 border bg-white border-gray-300 rounded-full"
-          >
-            <option value="Pilih lokasi">Pilih lokasi</option>
-            <option value="Sukun">Sukun</option>
-            <option value="Dau">Dau</option>
-            <option value="Ngawi">Ngawi</option>
-          </select>
-        </form>
-      </section>
+          <section className="2xl:w-295 lg:w-230 md:w-full mt-10 p-5 rounded-2xl">
+            <article className="flex flex-col md:flex-row">
+              <figure className="flex md:flex-col">
+                <img
+                  src={selectedImage}
+                  alt="Gambar Utama"
+                  className="md:w-full w-7/12 max-w-145 flex max-h-145 rounded-2xl shadow object-contain"
+                />
 
-      <section className="flex mt-10 justify-center text-white gap-5">
-        <form className="w-45 h-10">
-          <select
-            value={categoryFilter}
-            onChange={(e) => setCategoryFilter(e.target.value)}
-            className="w-full h-full px-2.5 border bg-primary border-gray-300 rounded-full"
-          >
-            <option value="Semua">Semua</option>
-            <option value="men's clothing">Men's Clothing</option>
-            <option value="women's clothing">Women's Clothing</option>
-            <option value="jewelery">Jewelery</option>
-            <option value="electronics">Electronics</option>
-          </select>
-        </form>
-        <form className="w-45 h-10">
-          <select
-            onChange={(e) => setConditionFilter(e.target.value)}
-            className="w-full h-full px-2.5 border bg-primary border-gray-300 rounded-full"
-          >
-            <option value="Kondisi">Kondisi</option>
-            <option value="Baru">Baru</option>
-            <option value="Normal">Normal</option>
-          </select>
-        </form>
-        <form className="w-45 h-10">
-          <select
-            value={sortOrder}
-            onChange={(e) => setSortOrder(e.target.value)}
-            className="w-full h-full px-2.5 border bg-primary border-gray-300 rounded-full"
-          >
-            <option value="Harga">Harga</option>
-            <option value="asc">Rendah ke tinggi</option>
-            <option value="desc">Tinggi ke rendah</option>
-          </select>
-        </form>
-      </section>
+                <div className="mt-15 md:ml-0 ml-20 flex md:flex-row flex-col md:gap-2 gap-5 ">
+                  {productDetail?.images?.map((img: string, index: number) => (
+                    <img
+                      key={index}
+                      src={img}
+                      alt={`Thumbnail ${index + 1}`}
+                      className={`2xl:w-25 lg:w-20 md:w-15 2xl:h-25 lg:h-20 md:h-15 w-15 h-15 rounded-2xl shadow object-cover cursor-pointer ${
+                        selectedImage === img ? " scale-125 mx-2" : ""
+                      }`}
+                      onClick={() => handleSelectImage(img)}
+                    />
+                  ))}
+                </div>
+              </figure>
 
-      <section className=" bg-main pt-8 px-16 2xl:px-32 flex justify-center w-full items-center mt-10">
-        <div className="grid grid-cols-3 lg:grid-cols-4 md:grid-cols-3 gap-5 ">
-          {removeDuplicateProducts(product)
-            .slice(0, displayLimit)
-            .map((product) => (
-              <ProductCards key={product.id} {...product} />
-            ))}
-        </div>
-      </section>
+              <div className="w-145 md:w-100 ml-5">
+                <div className="w-full h-10/12 space-y-1">
+                  <header className="flex flex-col gap-2">
+                    <h2 className="font-normal text-3xl sm:text-xl md:text-2xl 2xl:text-3xl text-gray">
+                      {productDetail?.title}
+                    </h2>
+                    <p className="font-semibold 2xl:text-4xl md:text-2xl text-3xl text-primary">
+                      RP. {productDetail?.price}
+                    </p>
+                  </header>
 
-      <section className="flex justify-center items-center pt-10 pb-10 bg-main">
-        {displayLimit < removeDuplicateProducts(product).length && (
-          <button
-            onClick={() => setDisplayLimit(displayLimit + 15)}
-            className="bg-primary text-white font-semibold text-base w-45 h-10 rounded-full cursor-pointer hover:bg-sky-700"
-          >
-            Lihat lebih banyak
-          </button>
-        )}
-      </section>
+                  <div className="flex md:flex-col md:items-start items-center justify-between">
+                    <figure className="2xl:mt-10 md:mt-5 mt-5 flex md:flex-row flex-col md:gap-0 gap-5 md:justify-between text-lg text-gray">
+                      <figcaption className="flex items-center gap-2">
+                        <img
+                          src={box}
+                          alt="box"
+                          className="2xl:w-7 2xl:h-7 w-5 h-5 "
+                        />
+                        <p>{productDetail?.condition}</p>
+                      </figcaption>
+                      <figcaption className="flex items-center gap-2">
+                        <img
+                          src={payment}
+                          alt="payment"
+                          className="2xl:w-7 2xl:h-7 w-5 h-5"
+                        />
+                        <p>{}</p>
+                      </figcaption>
+                      <figcaption className="flex items-center gap-2">
+                        <img
+                          src={lokasi}
+                          alt="location"
+                          className="2xl:w-6 2xl:h-7 w-4 h-5"
+                        />
+                        <p>{productDetail?.location}</p>
+                      </figcaption>
+                    </figure>
+
+                    <section className="flex justify-between mt-10 border rounded-2xl pt-5 px-3 2xl:w-145 w-100 h-35">
+                      <div className="space-y-5">
+                        <div className="flex gap-2.5">
+                          {/* <img src="" alt="" /> */}
+                          <div className="w-10 h-10 rounded-full bg-gray-600"></div>
+                          <p className="text-xl font-medium">
+                            {sellerName}
+                          </p>
+                        </div>
+
+                        <div className="flex gap-1 text-white font-semibold text-sm">
+                          <button
+                            onClick={() => navigate(`/chat`)}
+                            className="2xl:w-70 w-40 h-10 bg-primary rounded-full cursor-pointer hover:bg-sky-600"
+                          >
+                            <p>Chat</p>
+                          </button>
+                          <button className="2xl:w-45 w-40 h-10 bg-primary rounded-full cursor-pointer hover:bg-sky-600">
+                            <p>Tukar Tambah</p>
+                          </button>
+                          <button className="2xl:w-15 w-10 h-10 bg-primary rounded-full cursor-pointer hover:bg-sky-600 flex items-center justify-center">
+                            <LuHeart className="w-7 h-7" />
+                          </button>
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+
+                  <section className="mt-10">
+                    <h2 className="font-medium 2xl:text-2xl text-xl text-primary mt-5">
+                      Deskripsi Produk
+                    </h2>
+                    <p className="mt-5 md:w-full w-140">
+                      {productDetail?.description}
+                    </p>
+                  </section>
+                </div>
+              </div>
+              <section></section>
+            </article>
+          </section>
+        </main>
+      </header>
     </div>
   );
 };
 
-export default Home;
+export default Detail;
