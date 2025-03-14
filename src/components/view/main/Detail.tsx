@@ -70,8 +70,8 @@ const Detail = ({}: IProduct) => {
   }, [id]);
 
   return (
-    <div className="md:w-full w-lvh">
-      <header className="">
+    <div className="md:w-full sm:w-full w-lvh">
+      <header>
         <main className="flex flex-col items-center">
           <section className="mt-30 flex gap-5 justify-center">
             <form action="" className="relative">
@@ -126,7 +126,7 @@ const Detail = ({}: IProduct) => {
                     <h2 className="font-normal text-3xl sm:text-xl md:text-2xl 2xl:text-3xl text-gray">
                       {productDetail?.title}
                     </h2>
-                    <p className="font-semibold 2xl:text-4xl md:text-2xl text-3xl text-primary">
+                    <p className="font-semibold 2xl:text-4xl md:text-3xl text-2xl text-primary">
                       RP. {productDetail?.price.toLocaleString()}
                     </p>
                   </header>
@@ -139,7 +139,7 @@ const Detail = ({}: IProduct) => {
                           alt="box"
                           className="2xl:w-7 2xl:h-7 w-5 h-5 "
                         />
-                        <p>{productDetail?.condition}</p>
+                        <p className="text-base">{productDetail?.condition}</p>
                       </figcaption>
                       <figcaption className="flex items-center gap-2">
                         <img
@@ -147,7 +147,7 @@ const Detail = ({}: IProduct) => {
                           alt="payment"
                           className="2xl:w-7 2xl:h-7 w-5 h-5"
                         />
-                        <p>{productDetail?.agreementMethod}</p>
+                        <p className="text-base">{productDetail?.agreementMethod}</p>
                       </figcaption>
                       <figcaption className="flex items-center gap-2">
                         <img
@@ -155,7 +155,7 @@ const Detail = ({}: IProduct) => {
                           alt="location"
                           className="2xl:w-6 2xl:h-7 w-4 h-5"
                         />
-                        <p>{productDetail?.location}</p>
+                        <p className="text-base">{productDetail?.location}</p>
                       </figcaption>
                     </figure>
 
@@ -167,7 +167,7 @@ const Detail = ({}: IProduct) => {
                           <p className="text-xl font-medium">{sellerName}</p>
                         </div>
 
-                        <div className="flex flex-row md:flex-col gap-1 text-white font-semibold text-sm">
+                        <div className="flex gap-1 text-white font-semibold text-sm">
                           <button
                             onClick={() =>
                               handleProtectedAction(() => navigate(`/chat`))
@@ -196,7 +196,7 @@ const Detail = ({}: IProduct) => {
                     <h2 className="font-medium 2xl:text-2xl text-xl text-primary mt-5">
                       Deskripsi Produk
                     </h2>
-                    <p className="mt-5 md:w-full w-140">
+                    <p className="mt-5 w-200">
                       {productDetail?.description}
                     </p>
                   </section>
