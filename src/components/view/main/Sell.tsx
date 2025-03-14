@@ -5,6 +5,7 @@ import axios from "axios";
 import { END_API } from "../../../api/api";
 import { useUser } from "@clerk/clerk-react";
 import supabase from "../../../utils/supabase";
+import { useNavigate } from "react-router-dom";
 
 const Sell: React.FC = () => {
   const { user } = useUser();
@@ -17,6 +18,11 @@ const Sell: React.FC = () => {
   const [description, setDescription] = useState<string>("");
   const [nextId, setNextId] = useState<number | null>(null);
   const [dealMethod, setDealMethod] = useState<string[]>([]);
+  const navigate = useNavigate();
+
+  if (!user) {
+    navigate("/Login");
+  }
 
   const handleImage = (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files;
