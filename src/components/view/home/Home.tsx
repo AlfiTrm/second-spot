@@ -1,225 +1,183 @@
+import Carousel from "../../partial/home/Carousel";
+import ProductCards from "../../partial/home/ProductCards";
+import { FiSearch } from "react-icons/fi";
 import React, { useEffect, useState } from "react";
-import { MdImage } from "react-icons/md";
-import { IProduct } from "../../../data/Type";
 import axios from "axios";
-import { END_API } from "../../../api/api";
-import { useUser } from "@clerk/clerk-react";
-import supabase from "../../../utils/supabase";
+import { IProduct } from "../../../data/Type";
 
-const Sell: React.FC = () => {
-  const { user } = useUser();
-  const [image, setImage] = useState<string[]>([]);
-  const [title, setTitle] = useState<string>("");
-  const [category, setCategory] = useState<string>("");
-  const [condition, setCondition] = useState<string>("");
-  const [location, setLocation] = useState<string>("");
-  const [price, setPrice] = useState<string>("");
-  const [description, setDescription] = useState<string>("");
-  const [nextId, setNextId] = useState<number | null>(null);
+const Home: React.FC = () => {
+  const [product, setProduct] = useState<IProduct[]>([]);
+  const [allProduct, setAllProduct] = useState<IProduct[]>([]);
+  const [categoryFilter, setCategoryFilter] = useState<string>("Semua");
+  const [locationFilter, setLocationFilter] = useState<string>("Pilih lokasi");
+  const [conditionFilter, setConditionFilter] = useState<string>("Kondisi");
+  const [search, setSearch] = useState<string>("");
+  const [sortOrder, setSortOrder] = useState<string>("");
+  const [displayLimit, setDisplayLimit] = useState<number>(15);
 
-  const handleImage = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const files = event.target.files;
-    if (files) {
-      const selectedImage = Array.from(files).map((file) => {
-        return new Promise<string>((resolve, reject) => {
-          const reader = new FileReader();
-          reader.readAsDataURL(file);
-          reader.onload = () => resolve(reader.result as string);
-          console.log("Base64 URL:", reader.result);
-          reader.onerror = (error) => reject(error);
-        });
-      });
+  const getProducts = async () => {
+    try {
+      const response = await axios.get(
+        `${import.meta.env.VITE_SUPABASE_URL}/rest/v1/products`,
+        {
+          headers: {
+            apikey: import.meta.env.VITE_SUPABASE_ANON_KEY,
+            Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
+          },
+        }
+      );
+      const data: IProduct[] = response.data.map((item: IProduct) => ({
+        ...item,
+        location: getRandomLocation(),
+        condition: getRandomCondition(),
+      }));
 
-      Promise.all(selectedImage)
-        .then((encodedImage) => {
-          setImage((prevImage) => {
-            const previewImage = [...prevImage, ...encodedImage];
-            return previewImage.slice(0, 5);
-          });
-        })
-        .catch((error) => {
-          console.log("Gagal konversi gambar", error);
-        });
+      const storedProducts = JSON.parse(
+        localStorage.getItem("products") || "[]"
+      );
+      const mergeProducts = [...data, ...storedProducts];
+      setAllProduct(mergeProducts);
+      setProduct(mergeProducts);
+    } catch (error) {
+      console.error("Failed to Fetch products", error);
     }
   };
-  
-  const handleRemove = (index: number) => {
-    setImage(image.filter((_, i) => i !== index));
+
+  const getRandomLocation = () => {
+    const locations = ["Sukun", "Dau", "Ngawi"];
+    return locations[Math.floor(Math.random() * locations.length)];
   };
 
-  const getLastId = async () => {
-    const response = await axios.get(`${END_API.PRODUCTS}`);
-    const data: IProduct[] = response.data;
-    console.log(data);
-    const localData: IProduct[] = JSON.parse(
-      localStorage.getItem("products") || "[]"
-    );
-    const combineData = [...data, ...localData].map((product) => ({
-      ...product,
-      image: Array.isArray(product.image) ? product.image : [product.image],
-    }));
-
-    if (combineData.length > 0) {
-      const lastId = Math.max(...combineData.map((product) => product.id));
-      setNextId(lastId + 1);
-    }
+  const getRandomCondition = () => {
+    const conditions = ["Baru", "Normal", "Bekas"];
+    return conditions[Math.floor(Math.random() * conditions.length)];
   };
 
   useEffect(() => {
-    getLastId();
-  }, []);
+    const storedProducts = JSON.parse(localStorage.getItem("products") || "[]");
+    const combinedProducts = [...allProduct, ...storedProducts];
+    const filteredProducts = combinedProducts
+      .filter(
+        (product) =>
+          (categoryFilter === "Semua" || product.category === categoryFilter) &&
+          (locationFilter === "Pilih lokasi" ||
+            product.location === locationFilter) &&
+          (conditionFilter === "Kondisi" ||
+            product.condition === conditionFilter) &&
+          product.title.toLowerCase().includes(search.toLowerCase())
+      )
+      .sort((a, b) =>
+        sortOrder === "asc" ? a.price - b.price : b.price - a.price
+      );
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+    setProduct(filteredProducts);
+  }, [categoryFilter, locationFilter, conditionFilter, search, sortOrder]);
 
-    if (!title || !category || !condition || !price || !description) {
-      alert("Kolom belum diisi sepenuhnya.");
-      return;
-    }
-
-    const newProduct = {
-      title,
-      category,
-      condition,
-      location,
-      price: parseFloat(price),
-      description,
-      image,
-      userId: user?.id,
-    };
-
-    const { error } = await supabase.from("products").insert(newProduct);
-
-    if (error) {
-      console.error("gagal menyimpan produk: ", error.message);
-      alert("gagal menyimpan produk");
-      return;
-    }
-
-    alert("Produk terpasang.");
-    setTitle("");
-    setCategory("");
-    setCondition("");
-    setLocation("");
-    setPrice("");
-    setDescription("");
-    setImage([]);
-
-    setNextId((nextId ?? 0) + 1);
+  const removeDuplicateProducts = (products: IProduct[]) => {
+    const uniqueProducts = products.filter(
+      (product, index, self) =>
+        index === self.findIndex((p) => p.id === product.id)
+    );
+    return uniqueProducts;
   };
 
+  useEffect(() => {
+    getProducts();
+  }, []);
+
   return (
-    <div className="md:w-full sm:w-full w-lvh overflow-hidden">
-      <div className="flex flex-col items-center mt-20 p-5 ">
-        <header className="text-primary font-semibold w-185 text-4xl ">
-          <h2>Jual</h2>
-        </header>
+    <div className="pt-30 w-lvh md:w-full sm:w-full">
+      <section>{search === "" && <Carousel />}</section>
 
-        <form
-          onSubmit={handleSubmit}
-          className="flex flex-col mt-5 gap-5"
-          action=""
-        >
-          <div className="w-185 h-65 flex-col flex items-center relative border rounded-2xl">
-            <MdImage className=" w-7 h-7 mt-5 text-primary" />
-            <label className="flex justify-center items-center mt-5 w-40 h-10 cursor-pointer bg-primary text-white rounded-full hover:bg-sky-700">
-              Pilih Foto
-              <input
-                type="file"
-                multiple
-                className="hidden"
-                onChange={handleImage}
-              />
-            </label>
-            <div className="flex gap-3 overflow-x-auto max-w-full">
-              {image.map((image, index) => (
-                <>
-                  <div key={index} className="relative">
-                    <img
-                      src={image}
-                      alt={`Preview ${index + 1}`}
-                      className="w-25 h-25 object-contain rounded-lg mt-8"
-                    />
-
-                    <button
-                      className="absolute top-0 right-0 bg-red-500 text-white w-5 h-5 rounded-full text-xs"
-                      onClick={() => handleRemove(index)}
-                    >
-                      X
-                    </button>
-                  </div>
-                </>
-              ))}
-            </div>
-          </div>
+      <section className="mt-10  flex gap-5 justify-center items-center">
+        <form action="" className="relative">
           <input
-            type="text"
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            placeholder="Nama produk"
-            className="h-10 border rounded-2xl px-5"
+            type="search"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            name=""
+            id=""
+            placeholder="Cari Produk"
+            className="w-90 md:w-120 2xl:w-195 h-12 px-5 border border-gray-300 bg-white shadow-gray-200 rounded-full"
           />
+          <button className="cursor-pointer">
+            <div className="w-20 h-8 bg-primary absolute top-2 right-5 rounded-full"></div>
+            <FiSearch className="absolute text-white w-4 h-4 top-4 right-13" />
+          </button>
+        </form>
 
+        <form className="w-95 h-12">
           <select
-            value={category}
-            onChange={(e) => setCategory(e.target.value)}
-            className="h-10 border rounded-2xl px-5"
+            onChange={(e) => setLocationFilter(e.target.value)}
+            className="md:w-full w-80 h-full px-2.5 border bg-white border-gray-300 rounded-full"
           >
-            <option value="">Pilih kategori</option>
+            <option value="Pilih lokasi">Pilih lokasi</option>
+            <option value="Sukun">Sukun</option>
+            <option value="Dau">Dau</option>
+            <option value="Ngawi">Ngawi</option>
+          </select>
+        </form>
+      </section>
+
+      <section className="flex mt-10 justify-center text-white gap-5">
+        <form className="w-45 h-10">
+          <select
+            value={categoryFilter}
+            onChange={(e) => setCategoryFilter(e.target.value)}
+            className="w-full h-full px-2.5 border bg-primary border-gray-300 rounded-full"
+          >
+            <option value="Semua">Semua</option>
             <option value="men's clothing">Men's Clothing</option>
             <option value="women's clothing">Women's Clothing</option>
             <option value="jewelery">Jewelery</option>
             <option value="electronics">Electronics</option>
           </select>
-
+        </form>
+        <form className="w-45 h-10">
           <select
-            value={condition}
-            onChange={(e) => setCondition(e.target.value)}
-            className="h-10 border rounded-2xl px-5"
+            onChange={(e) => setConditionFilter(e.target.value)}
+            className="w-full h-full px-2.5 border bg-primary border-gray-300 rounded-full"
           >
-            <option value="">Pilih kondisi</option>
+            <option value="Kondisi">Kondisi</option>
             <option value="Baru">Baru</option>
             <option value="Normal">Normal</option>
-            <option value="Bekas">Bekas</option>
           </select>
-
-          <select
-            value={location}
-            onChange={(e) => setLocation(e.target.value)}
-            className="h-10 border rounded-2xl px-5"
-          >
-            <option value="">Pilih lokasi</option>
-            <option value="Sukun">Sukun</option>
-            <option value="Dau">Dau</option>
-            <option value="Ngawi">Ngawi</option>
-          </select>
-
-          <input
-            type="text"
-            value={price}
-            onChange={(e) => setPrice(e.target.value)}
-            placeholder="Harga"
-            className="h-10 border rounded-2xl px-5"
-          />
-
-          <input
-            type="text"
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-            placeholder="Deskripsi"
-            className="h-50 border rounded-2xl px-5"
-          />
-          
-          <button
-            type="submit"
-            className="h-10 bg-primary text-white font-semibold text-base rounded-2xl"
-          >
-            Pasang sekarang
-          </button>
         </form>
-      </div>
+        <form className="w-45 h-10">
+          <select
+            value={sortOrder}
+            onChange={(e) => setSortOrder(e.target.value)}
+            className="w-full h-full px-2.5 border bg-primary border-gray-300 rounded-full"
+          >
+            <option value="Harga">Harga</option>
+            <option value="asc">Rendah ke tinggi</option>
+            <option value="desc">Tinggi ke rendah</option>
+          </select>
+        </form>
+      </section>
+
+      <section className=" bg-main pt-8 px-16 2xl:px-32 flex justify-center w-full items-center mt-10">
+        <div className="grid grid-cols-3 lg:grid-cols-4 md:grid-cols-3 gap-5 ">
+          {removeDuplicateProducts(product)
+            .slice(0, displayLimit)
+            .map((product) => (
+              <ProductCards key={product.id} {...product} />
+            ))}
+        </div>
+      </section>
+
+      <section className="flex justify-center items-center pt-10 pb-10 bg-main">
+        {displayLimit < removeDuplicateProducts(product).length && (
+          <button
+            onClick={() => setDisplayLimit(displayLimit + 15)}
+            className="bg-primary text-white font-semibold text-base w-45 h-10 rounded-full cursor-pointer hover:bg-sky-700"
+          >
+            Lihat lebih banyak
+          </button>
+        )}
+      </section>
     </div>
   );
 };
 
-export default Sell;
+export default Home;
