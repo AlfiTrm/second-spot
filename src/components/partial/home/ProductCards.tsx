@@ -64,7 +64,7 @@ const ProductCards = (props: IProduct) => {
         (item: IProduct) => item.id !== product.id
       );
       localStorage.setItem("favorites", JSON.stringify(updatedFavorites));
-      alert("Produk terhapus");
+      window.location.reload()
     } catch (error) {
       console.log("Gagal dihapus", error);
       alert("Produk gagal untuk dihapus");
@@ -112,9 +112,9 @@ const ProductCards = (props: IProduct) => {
           className="cursor-pointer mt-2 text-primary"
         >
           {isHovered || isLiked ? (
-            <FaHeart className="w-5 h-5 text-red-500" />
+            <FaHeart className="w-5 h-5 text-primary hover:text-primary" />
           ) : (
-            <LuHeart className="w-5 h-5  object-cover" />
+            <LuHeart className="w-5 h-5 " />
           )}
         </button>
       </div>
