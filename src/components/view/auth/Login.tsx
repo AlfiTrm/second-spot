@@ -17,13 +17,14 @@ const Login = () => {
     e.preventDefault();
 
     try {
-      const result = await signIn?.create({
+      const results = await signIn?.create({
         identifier: email,
         password,
       });
-
-      if (result?.status === "complete") {
+      console.log(results?.id);
+      if (results?.status === "complete") {
         navigate("/");
+        window.location.reload();
       } else {
         alert("Login gagal");
       }
