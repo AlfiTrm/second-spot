@@ -4,6 +4,7 @@ import { BiHide, BiShowAlt } from "react-icons/bi";
 import logo from "../../../assets/logo/logo.webp";
 import { useSignUp } from "@clerk/clerk-react";
 import { useClerk } from "@clerk/clerk-react";
+import supabase from "../../../utils/supabase";
 
 const Register = () => {
   const { signUp } = useSignUp();
@@ -16,10 +17,8 @@ const Register = () => {
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [confirmPassword, setConfirmPassword] = useState<string>("");
-
   const [pendingVerif, setPendingVerif] = useState<boolean>(false);
   const [code, setCode] = useState<string>("");
-
   const navigate = useNavigate();
 
   const handleRegister = async (e: FormEvent<HTMLFormElement>) => {
@@ -50,9 +49,22 @@ const Register = () => {
     try {
       const result = await signUp?.attemptEmailAddressVerification({ code });
       if (result?.status === "complete") {
-        await signOut();
-        alert("Silahkan Login");
-        navigate("/Login");
+        const { data, error } = await supabase.from("users").insert([
+          {
+            id: result.createdUserId,
+            username,
+            email,
+          },
+        ]);
+        console.log(result.createdUserId);
+        if (error) {
+          console.error("Gagal menambahkan data ke Supabase:", error.message);
+        } else {
+          console.log("Data user berhasil ditambahkan ke Supabase:", data);
+          await signOut();
+          navigate("/Login");
+          alert("Silahkan Login");
+        }
       } else {
         alert("Kode verifikasi tidak valid");
       }
@@ -62,7 +74,7 @@ const Register = () => {
   };
 
   return (
-    <div>
+    <>
       <div className="font-primary w-full h-lvh bg-white flex">
         <section className=" bg-white w-full md:flex justify-center items-center h-full hidden">
           <figure className="text-primary min-w-4/12 md:w-6/12 ">
@@ -189,7 +201,7 @@ const Register = () => {
           </section>
         </section>
       </div>
-    </div>
+    </>
   );
 };
 
