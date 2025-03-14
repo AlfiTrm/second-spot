@@ -4,15 +4,16 @@ import { FiSearch } from "react-icons/fi";
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { IProduct } from "../../../data/Type";
+import CustomDropdown from "../../partial/home/DropDown";
 
 const Home: React.FC = () => {
   const [product, setProduct] = useState<IProduct[]>([]);
   const [allProduct, setAllProduct] = useState<IProduct[]>([]);
-  const [categoryFilter, setCategoryFilter] = useState<string>("Semua");
+  const [categoryFilter, setCategoryFilter] = useState<string>("KATEGORI");
   const [locationFilter, setLocationFilter] = useState<string>("Pilih lokasi");
-  const [conditionFilter, setConditionFilter] = useState<string>("Kondisi");
+  const [conditionFilter, setConditionFilter] = useState<string>("KONDISI");
   const [search, setSearch] = useState<string>("");
-  const [sortOrder, setSortOrder] = useState<string>("");
+  const [sortOrder, setSortOrder] = useState<string>("HARGA");
   const [displayLimit, setDisplayLimit] = useState<number>(15);
 
   const getProducts = async () => {
@@ -28,8 +29,6 @@ const Home: React.FC = () => {
       );
       const data: IProduct[] = response.data.map((item: IProduct) => ({
         ...item,
-        location: getRandomLocation(),
-        condition: getRandomCondition(),
       }));
 
       const storedProducts = JSON.parse(
@@ -43,31 +42,21 @@ const Home: React.FC = () => {
     }
   };
 
-  const getRandomLocation = () => {
-    const locations = ["Sukun", "Dau", "Ngawi"];
-    return locations[Math.floor(Math.random() * locations.length)];
-  };
-
-  const getRandomCondition = () => {
-    const conditions = ["Baru", "Normal", "Bekas"];
-    return conditions[Math.floor(Math.random() * conditions.length)];
-  };
-
   useEffect(() => {
     const storedProducts = JSON.parse(localStorage.getItem("products") || "[]");
     const combinedProducts = [...allProduct, ...storedProducts];
     const filteredProducts = combinedProducts
       .filter(
         (product) =>
-          (categoryFilter === "Semua" || product.category === categoryFilter) &&
+          (categoryFilter === "KATEGORI" || product.category === categoryFilter) &&
           (locationFilter === "Pilih lokasi" ||
             product.location === locationFilter) &&
-          (conditionFilter === "Kondisi" ||
+          (conditionFilter === "KONDISI" ||
             product.condition === conditionFilter) &&
           product.title.toLowerCase().includes(search.toLowerCase())
       )
       .sort((a, b) =>
-        sortOrder === "asc" ? a.price - b.price : b.price - a.price
+        sortOrder === "HARGA" ? a.price - b.price : b.price - a.price
       );
 
     setProduct(filteredProducts);
@@ -107,52 +96,55 @@ const Home: React.FC = () => {
         </form>
 
         <form className="w-95 h-12">
-          <select
-            onChange={(e) => setLocationFilter(e.target.value)}
-            className="md:w-full w-80 h-full px-2.5 border bg-white border-gray-300 rounded-full"
-          >
-            <option value="Pilih lokasi">Pilih lokasi</option>
-            <option value="Sukun">Sukun</option>
-            <option value="Dau">Dau</option>
-            <option value="Ngawi">Ngawi</option>
-          </select>
+          <CustomDropdown
+            options={["Pilih lokasi", "Dau", "Lowokwaru", "Dieng"]}
+            selected={locationFilter}
+            onChange={setLocationFilter}
+            variant="plain"
+            
+            
+          />
         </form>
       </section>
 
       <section className="flex mt-10 justify-center text-white gap-5">
         <form className="w-45 h-10">
-          <select
-            value={categoryFilter}
-            onChange={(e) => setCategoryFilter(e.target.value)}
-            className="w-full h-full px-2.5 border bg-primary border-gray-300 rounded-full"
-          >
-            <option value="Semua">Semua</option>
-            <option value="men's clothing">Men's Clothing</option>
-            <option value="women's clothing">Women's Clothing</option>
-            <option value="jewelery">Jewelery</option>
-            <option value="electronics">Electronics</option>
-          </select>
+          <CustomDropdown
+            options={[
+              "KATEGORI",
+              "Buku & Alat Tulis",
+              "Elektronik & Gadget",
+              "Kendaraan",
+              "Perabotan Kos",
+              "Fashion & Aksesoris",
+              "Olahraga & Hobi",
+              "Tiket & Voucher",
+            ]}
+            selected={categoryFilter}
+            onChange={setCategoryFilter}
+          />
         </form>
         <form className="w-45 h-10">
-          <select
-            onChange={(e) => setConditionFilter(e.target.value)}
-            className="w-full h-full px-2.5 border bg-primary border-gray-300 rounded-full"
-          >
-            <option value="Kondisi">Kondisi</option>
-            <option value="Baru">Baru</option>
-            <option value="Normal">Normal</option>
-          </select>
+          <CustomDropdown
+            options={[
+              "KONDISI",
+              "Baru",
+              "Seperti Baru",
+              "Preloved",
+              "Kondisi Baik",
+              "Layak Pakai",
+              "Apa Adanya",
+            ]}
+            selected={conditionFilter}
+            onChange={setConditionFilter}
+          />
         </form>
         <form className="w-45 h-10">
-          <select
-            value={sortOrder}
-            onChange={(e) => setSortOrder(e.target.value)}
-            className="w-full h-full px-2.5 border bg-primary border-gray-300 rounded-full"
-          >
-            <option value="Harga">Harga</option>
-            <option value="asc">Rendah ke tinggi</option>
-            <option value="desc">Tinggi ke rendah</option>
-          </select>
+          <CustomDropdown
+            options={["HARGA", "Tinggi ke Rendah", "Rendah ke Tinggi"]}
+            selected={sortOrder}
+            onChange={setSortOrder}
+          />
         </form>
       </section>
 
