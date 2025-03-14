@@ -2,15 +2,14 @@ import { Link, useNavigate } from "react-router-dom";
 import React, { useState } from "react";
 import { HiMenu } from "react-icons/hi";
 import { BsChatLeftText } from "react-icons/bs";
-import { IoCloseOutline, IoNotificationsOutline } from "react-icons/io5";
-import { LuMinus, LuPlus, LuTrash, LuHeart } from "react-icons/lu";
+import { IoNotificationsOutline } from "react-icons/io5";
+import { LuHeart } from "react-icons/lu";
 import logo from "../../assets/logo/logo.webp";
 import { useUser } from "@clerk/clerk-react";
 
 const Navbar: React.FC = () => {
   const { user } = useUser();
   const [isMenuOpen, setIsMenuOpen] = useState<boolean>(false);
-  const [isCartOpen, setIsCartOpen] = useState<boolean>(false);
   const navigate = useNavigate();
   return (
     <nav className="fixed px-10 md:px-14 2xl:px-33 h-20 top-0 flex font-semibold font-primary text-xl w-full justify-between z-50 p-6 bg-main border-b-gray-500 border-b">
@@ -96,53 +95,30 @@ const Navbar: React.FC = () => {
       {isMenuOpen && (
         <div className="absolute top-full left-0 w-full h-lvh bg-white lg:hidden shadow-lg">
           <div className="flex flex-col p-4 gap-5 items-center">
-            <Link onClick={() => setIsMenuOpen(false)} to={"/"} className="text-primary">
+            <Link
+              onClick={() => setIsMenuOpen(false)}
+              to={"/"}
+              className="text-primary"
+            >
               Beranda
             </Link>
-            <Link onClick={() => setIsMenuOpen(false)} to={"/sell"} className="text-primary">
+            <Link
+              onClick={() => setIsMenuOpen(false)}
+              to={"/sell"}
+              className="text-primary"
+            >
               Jual
             </Link>
             <Link to={"/blablas"} className="text-primary">
               Chat
             </Link>
-            <Link onClick={() => setIsMenuOpen(false)} to={"/profile"} className="text-primary">
+            <Link
+              onClick={() => setIsMenuOpen(false)}
+              to={"/profile"}
+              className="text-primary"
+            >
               profil
             </Link>
-          </div>
-        </div>
-      )}
-      {isCartOpen && (
-        <div className="absolute  shadow shadow-gray-500 top-24 right-0 w-md h-lvh bg-white">
-          <div className="p-5 text-3xl">
-            <div className="flex items-center justify-between">
-              <h2>Cart</h2>
-              <button
-                onClick={() => setIsCartOpen(!isCartOpen)}
-                className="cursor-pointer"
-              >
-                <IoCloseOutline className="w-10 h-10" />
-              </button>
-            </div>
-
-            <div className="mt-10 h-48 flex items-center ">
-              <div className="border m-2 w-32 h-32 rounded-xl"></div>
-              {/* <img src={HiMenu} alt="" /> */}
-              <div className="text-xl mt-2 flex flex-col gap-3 w-full m-2">
-                <div className="flex justify-between">
-                  <h3>Nama Produk</h3>
-                  <p className="text-primary text-">Rp. Xx.Xxx</p>
-                </div>
-                <div className="flex justify-between items-center text-lg font-normal">
-                  <p>status</p>
-                  <LuTrash />
-                </div>
-                <button className="flex items-center justify-between px-2 w-24 h-8 border rounded-xl">
-                  <LuMinus />
-                  <p>1</p>
-                  <LuPlus />
-                </button>
-              </div>
-            </div>
           </div>
         </div>
       )}
