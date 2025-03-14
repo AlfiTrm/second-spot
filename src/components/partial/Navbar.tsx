@@ -96,16 +96,16 @@ const Navbar: React.FC = () => {
       {isMenuOpen && (
         <div className="absolute top-full left-0 w-full h-lvh bg-white lg:hidden shadow-lg">
           <div className="flex flex-col p-4 gap-5 items-center">
-            <Link to={"/"} className="text-primary">
+            <Link onClick={() => setIsMenuOpen(false)} to={"/"} className="text-primary">
               Beranda
             </Link>
-            <Link to={"/blabla"} className="text-primary">
+            <Link onClick={() => setIsMenuOpen(false)} to={"/sell"} className="text-primary">
               Jual
             </Link>
             <Link to={"/blablas"} className="text-primary">
               Chat
             </Link>
-            <Link to={"/blablas"} className="text-primary">
+            <Link onClick={() => setIsMenuOpen(false)} to={"/profile"} className="text-primary">
               profil
             </Link>
           </div>
