@@ -10,6 +10,7 @@ import ChangeProfile from "./components/view/user/ChangeProfile";
 import Sell from "./components/view/main/Sell";
 import PasswordChange from "./components/view/user/PasswordChange";
 import Chat from "./components/view/main/ChatRoom";
+import NotFound from "./components/view/notfound/NotFound";
 
 const router = createHashRouter([
   {
@@ -31,8 +32,7 @@ const router = createHashRouter([
           category={""}
           description={""}
           image={""}
-          userId={""}
-        />
+          userId={""} agreementMethod={""}        />
       </MainLayout>
     ),
   },
@@ -91,6 +91,10 @@ const router = createHashRouter([
   {
     path: "/Login",
     element: <Login />,
+  },
+  {
+    path: "*",
+    element: <NotFound />,
   },
 ]);
 
