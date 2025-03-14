@@ -7,13 +7,24 @@ import payment from "../../../assets/detail/handShake.webp";
 import { FiSearch } from "react-icons/fi";
 import { LuHeart } from "react-icons/lu";
 import supabase from "../../../utils/supabase";
+import { useAuth } from "@clerk/clerk-react";
 
 const Detail = ({}: IProduct) => {
   const { id } = useParams();
+  const { isSignedIn } = useAuth();
   const [productDetail, setProductDetail] = useState<IProduct | null>(null);
   const [selectedImage, setSelectedImage] = useState<string>("");
   const navigate = useNavigate();
   const [sellerName, setSellerName] = useState<string>("");
+
+  const handleProtectedAction = (action: () => void) => {
+    if (isSignedIn) {
+      action();
+    } else {
+      navigate("/Login");
+    }
+  };
+
   const getProductDetail = async () => {
     const { data, error } = await supabase
       .from("products")
@@ -45,7 +56,7 @@ const Detail = ({}: IProduct) => {
       const imagesArray = Array.isArray(data.image) ? data.image : [data.image];
       const seller = await getSellerName(data.userId);
       setSellerName(seller);
-      setProductDetail({ ...data, images: imagesArray });
+      setProductDetail({ ...data, images: imagesArray,  agreementMethod: data.metode_kesepakatan });
       setSelectedImage(imagesArray[0]);
     }
   };
@@ -91,7 +102,7 @@ const Detail = ({}: IProduct) => {
                 <img
                   src={selectedImage}
                   alt="Gambar Utama"
-                  className="md:w-full w-7/12 max-w-145 flex max-h-145 rounded-2xl shadow object-contain"
+                  className="md:w-145  max-w-145 flex max-h-145 rounded-2xl shadow object-contain"
                 />
 
                 <div className="mt-15 md:ml-0 ml-20 flex md:flex-row flex-col md:gap-2 gap-5 ">
@@ -116,12 +127,12 @@ const Detail = ({}: IProduct) => {
                       {productDetail?.title}
                     </h2>
                     <p className="font-semibold 2xl:text-4xl md:text-2xl text-3xl text-primary">
-                      RP. {productDetail?.price}
+                      RP. {productDetail?.price.toLocaleString()}
                     </p>
                   </header>
 
-                  <div className="flex md:flex-col md:items-start items-center justify-between">
-                    <figure className="2xl:mt-10 md:mt-5 mt-5 flex md:flex-row flex-col md:gap-0 gap-5 md:justify-between text-lg text-gray">
+                  <div className="flex md:flex-col md:items-start items-center justify-between ">
+                    <figure className="2xl:mt-10 md:mt-5 mt-5 flex md:flex-row flex-col md:gap-0 w-full gap-5 md:justify-between text-lg text-gray">
                       <figcaption className="flex items-center gap-2">
                         <img
                           src={box}
@@ -136,7 +147,7 @@ const Detail = ({}: IProduct) => {
                           alt="payment"
                           className="2xl:w-7 2xl:h-7 w-5 h-5"
                         />
-                        <p>{}</p>
+                        <p>{productDetail?.agreementMethod}</p>
                       </figcaption>
                       <figcaption className="flex items-center gap-2">
                         <img
@@ -153,14 +164,14 @@ const Detail = ({}: IProduct) => {
                         <div className="flex gap-2.5">
                           {/* <img src="" alt="" /> */}
                           <div className="w-10 h-10 rounded-full bg-gray-600"></div>
-                          <p className="text-xl font-medium">
-                            {sellerName}
-                          </p>
+                          <p className="text-xl font-medium">{sellerName}</p>
                         </div>
 
-                        <div className="flex gap-1 text-white font-semibold text-sm">
+                        <div className="flex flex-row md:flex-col gap-1 text-white font-semibold text-sm">
                           <button
-                            onClick={() => navigate(`/chat`)}
+                            onClick={() =>
+                              handleProtectedAction(() => navigate(`/chat`))
+                            }
                             className="2xl:w-70 w-40 h-10 bg-primary rounded-full cursor-pointer hover:bg-sky-600"
                           >
                             <p>Chat</p>
@@ -168,7 +179,12 @@ const Detail = ({}: IProduct) => {
                           <button className="2xl:w-45 w-40 h-10 bg-primary rounded-full cursor-pointer hover:bg-sky-600">
                             <p>Tukar Tambah</p>
                           </button>
-                          <button className="2xl:w-15 w-10 h-10 bg-primary rounded-full cursor-pointer hover:bg-sky-600 flex items-center justify-center">
+                          <button
+                            onClick={() =>
+                              handleProtectedAction(() => navigate("/favorite"))
+                            }
+                            className="2xl:w-15 w-10 h-10 bg-primary rounded-full cursor-pointer hover:bg-sky-600 flex items-center justify-center"
+                          >
                             <LuHeart className="w-7 h-7" />
                           </button>
                         </div>
