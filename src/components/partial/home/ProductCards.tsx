@@ -83,7 +83,7 @@ const ProductCards = (props: IProduct) => {
   return (
     <div
       key={props.id}
-      className="md:w-50 md:h-90 2xl:w-70 h-90 bg-white rounded-xl hover:bg-gray-200 hover:transition-all cursor-pointer overflow-hidden "
+      className="md:w-50 md:h-90 2xl:w-70 h-90 bg-white rounded-xl hover:scale-105 hover:shadow-xl border border-gray-200 hover:transition-all cursor-pointer overflow-hidden "
     >
       <img
         onClick={handleNavigate}
@@ -98,7 +98,7 @@ const ProductCards = (props: IProduct) => {
             : props.title}
         </p>
         <p className=" text-primary text-lg font-semibold -mt-2">
-          Rp. {props.price}
+          Rp. {props.price.toLocaleString()}
         </p>
         <p className="text-gray-500 text-xs mt-1">{props.condition}</p>
         <div className="flex items-center gap-1 mt-1">
